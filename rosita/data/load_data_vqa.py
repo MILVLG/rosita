@@ -30,17 +30,11 @@ class DataSet(Data.Dataset):
         self.vocab_size = len(self.tokenizer.vocab)
         logging.info('[dataset: {}] Total Vocab: {}'.format(RUN_MODE, self.vocab_size))
 
-        self.ans_to_ix, self.ix_to_ans = DataSet.load_ans_tabel(__C.ANS_TABEL)
+        self.ans_to_ix, self.ix_to_ans = DataSet.load_ans_vocab()
         self.ans_size = len(self.ans_to_ix)
         logging.info('[dataset: {}] Total Ans: {}'.format(RUN_MODE, len(self.ans_to_ix)))
 
         logging.info('[dataset: {}] Loader Initialized'.format(RUN_MODE))
-        
-        obj_vocab = open('rosita/utils/genome_vocabs/objects_vocab.txt', 'r').readlines()
-        self.obj_id_map = {i: v.strip().split(',')[0] for i, v in enumerate(obj_vocab)}
-
-        attr_vocab = open('rosita/utils/genome_vocabs/attributes_vocab.txt', 'r').readlines()
-        self.attr_id_map = {i: v.strip().split(',')[0] for i, v in enumerate(attr_vocab)}
 
 
     def __getitem__(self, idx):
@@ -155,8 +149,8 @@ class DataSet(Data.Dataset):
 
 
     @staticmethod
-    def load_ans_tabel(ans_tabel):
-        return json.load(open('rosita/utils/answer_tabels/answer_tabel_[{}].json'.format(ans_tabel), 'r'))
+    def load_ans_vocab():
+        return json.load(open('rosita/vqa/answer_vocab.json', 'r'))
 
     
     @staticmethod

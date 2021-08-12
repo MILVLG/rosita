@@ -1,5 +1,5 @@
 import os, datetime, argparse
-from model.itr import Net
+from rosita.model.itr import Net
 from rosita.config.cfg import Cfg
 import yaml
 import torch, datetime, logging, random, math

@@ -2,7 +2,7 @@ import torch, copy, logging
 
 
 '''
-ans_tabel: [{'abc': 0, }, {'0': 'abc', }]
+ans_vocab: [{'abc': 0, }, {'0': 'abc', }]
 '''
 def qa_cls_weight_filter(weight, bias, orin_ans_table, target_ans_table):
     assert weight.size(0) == len(orin_ans_table[0]) and bias.size(0) == len(orin_ans_table[0])
@@ -14,9 +14,9 @@ def qa_cls_weight_filter(weight, bias, orin_ans_table, target_ans_table):
 
 
     if orin_ans_table[0] == target_ans_table[0]:
-        logging.info('qa answer tabel are same from loaded weight, skip filter qa head cls weight')
+        logging.info('qa answer vocab are same from loaded weight, skip filter qa head cls weight')
     else:
-        logging.info('qa answer tabel are not same from loaded weight, start to filter qa head cls weight')
+        logging.info('qa answer vocab are not same from loaded weight, start to filter qa head cls weight')
         loaded = 0
         unload = 0
         ans_map_list = []

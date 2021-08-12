@@ -6,7 +6,7 @@ import numpy as np
 
 import os, argparse, yaml
 from rosita.config.cfg import Cfg
-from model.rec import Net
+from rosita.model.rec import Net
 
 import torch.distributed as dist
 from rosita.data.load_data_rec import DataSet

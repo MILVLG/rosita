@@ -7,7 +7,7 @@ import numpy as np
 from rosita.config.cfg import Cfg
 from rosita.vqa.eval import vqa_eval
 import torch.multiprocessing as mp
-from model.vqa import Net
+from rosita.model.vqa import Net
 import torch.distributed as dist
 from rosita.data.load_data_vqa import DataSet
 from rosita.utils.optimizer import BertAdam, WarmupOptimizer
@@ -82,14 +82,14 @@ class Execution:
 
                     strict = True
                     if weight_key in ['mm_qa_head']:
-                        qa_cls_ans_tabel = DataSet.load_ans_tabel(self.cfg.QA_CLS_ANS_TABEL)
+                        qa_cls_ans_vocab = DataSet.load_ans_vocab()
                         if self.cfg.QA_CLS_WEIGHT_MACTH:
                             weight_load['dense1.weight'], weight_load['dense1.bias'] = qa_cls_weight_filter(
-                                weight_load['dense1.weight'], weight_load['dense1.bias'], qa_cls_ans_tabel,
+                                weight_load['dense1.weight'], weight_load['dense1.bias'], qa_cls_ans_vocab,
                                 (train_loader.dataset.ans_to_ix, train_loader.dataset.ix_to_ans))
-                        elif train_loader.dataset.ans_to_ix != qa_cls_ans_tabel[0]:
+                        elif train_loader.dataset.ans_to_ix != qa_cls_ans_vocab[0]:
                             logging.info(
-                                'answer tabels are not same and do not use qa cls weight match, will remove cls weight')
+                                'answer vocabs are not same and do not use qa cls weight match, will remove cls weight')
                             weight_load.pop('dense1.weight')
                             weight_load.pop('dense1.bias')
                             strict = False

@@ -76,14 +76,10 @@ class Cfg(Path):
         ]
 
         # VQA settings
-        self.QA_CLS_ANS_TABEL = 'vqa'
         self.QA_CLS_WEIGHT_MACTH = False
         self.PUNCT_ANS_MAP = {
-            'gqa': False,
             'vqa': True,
-            'genome': True,
         }
-        self.ANS_TABEL = 'vqa'
 
         # ITR Params
         self.NEG_BATCHSIZE = 25
