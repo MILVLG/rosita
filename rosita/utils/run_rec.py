@@ -1,19 +1,21 @@
-import os, datetime, argparse, yaml
-import torch, logging, random
+import torch, datetime, logging, random, copy
 import torch.nn as nn
 import torch.optim as Optim
+import torch.multiprocessing as mp
 import numpy as np
 
+import os, argparse, yaml
 from rosita.config.cfg import Cfg
-from rosita.vqa.eval import vqa_eval
-import torch.multiprocessing as mp
-from rosita.model.vqa import Net
+from rosita.modeling.rec import Net
+
 import torch.distributed as dist
-from rosita.data.load_data_vqa import DataSet
+from rosita.data.load_data_rec import DataSet
 from rosita.utils.optimizer import BertAdam, WarmupOptimizer
 from rosita.utils.sampler import SubsetDistributedSampler
 from rosita.utils.segment import TextSegment
-from rosita.utils.weight_filter import qa_cls_weight_filter
+from rosita.refs.bbox_transform import clip_boxes, bbox_transform_inv
+from rosita.refs.bbox import bbox_overlaps
+
 from torch.nn.parallel import DistributedDataParallel as DDP
 
 
@@ -55,7 +57,6 @@ class Execution:
     def train(self, train_loader, eval_loader):
         init_map = {
             'vocab_size': train_loader.dataset.vocab_size,
-            'ans_size': train_loader.dataset.ans_size,
         }
 
         net = self.Net(self.cfg, init_map)
@@ -79,21 +80,7 @@ class Execution:
             for weight_key in self.cfg.CKPT_LOAD_MAP:
                 if weight_key not in ['net_optim', 'epoch']:
                     weight_load = ckpt[self.cfg.CKPT_LOAD_MAP[weight_key]]
-
                     strict = True
-                    if weight_key in ['mm_qa_head']:
-                        qa_cls_ans_vocab = DataSet.load_ans_vocab()
-                        if self.cfg.QA_CLS_WEIGHT_MACTH:
-                            weight_load['dense1.weight'], weight_load['dense1.bias'] = qa_cls_weight_filter(
-                                weight_load['dense1.weight'], weight_load['dense1.bias'], qa_cls_ans_vocab,
-                                (train_loader.dataset.ans_to_ix, train_loader.dataset.ix_to_ans))
-                        elif train_loader.dataset.ans_to_ix != qa_cls_ans_vocab[0]:
-                            logging.info(
-                                'answer vocabs are not same and do not use qa cls weight match, will remove cls weight')
-                            weight_load.pop('dense1.weight')
-                            weight_load.pop('dense1.bias')
-                            strict = False
-
                     getattr(net.module, weight_key).load_state_dict(weight_load, strict=strict)
                 elif weight_key in ['net_optim']:
                     net_optim_inside.load_state_dict(ckpt[self.cfg.CKPT_LOAD_MAP[weight_key]])
@@ -110,7 +97,8 @@ class Execution:
             start_epoch = 0
 
         total_loss_sum = 0
-        mm_qa_loss_sum = 0
+        refs_rank_loss_sum = 0
+        refs_reg_loss_sum = 0
         named_params = list(net.named_parameters())
         grad_norm = np.zeros(len(named_params))
 
@@ -127,18 +115,16 @@ class Execution:
             if epoch in self.cfg.NET_LR_DECAY_LIST:
                 net_optim.decay(self.cfg.NET_LR_DECAY_R)
 
-            if 'qa' in self.cfg.TASKS['mm'] and epoch == self.cfg.LOSS_TRANSFER[0]:
-                self.cfg.LOSSFUNC_MAPPING['mm']['qa'] = self.cfg.LOSS_TRANSFER[1]
-
             for step, train_data in enumerate(train_loader):
                 proc_rank = self.cfg.GRANK if self.cfg.MP_STORAGE_SHR['screen'] else self.cfg.LRANK
                 if step % 1000 == 0 and proc_rank == 0:
                     logging.info('[Epoch Trained: {:.2f} %][Lr: {:.7f}]'.format(step / len(train_loader) * 100.,
                                                                                 np.array(net_optim.get_lr()).mean()))
 
-                text_input_ids, text_mask, \
-                imgfeat_input, imgfeat_mask, imgfeat_bbox, \
-                qa_label, qa_loss_valid, text_id = train_data
+                text_input_ids, text_mask, imgfeat_input, imgfeat_mask, imgfeat_bbox, \
+                refs_gt_boxes, refs_img_boxes, refs_img_shape, \
+                refs_rank_label, refs_rank_weight, refs_rank_loss_valid, \
+                refs_reg_label, refs_reg_weight, refs_reg_loss_valid = train_data
 
                 text_input_ids = text_input_ids.to(self.cfg.DEVICE_IDS[0])
                 text_mask = text_mask.to(self.cfg.DEVICE_IDS[0])
@@ -150,24 +136,27 @@ class Execution:
                 # network step
                 net_optim.zero_grad()
                 net_output = net(net_input)
+                pooled_output, text_output, imgfeat_output, pred_refs_rank, pred_refs_reg = net_output
 
-                pooled_output, text_output, imgfeat_output, pred_mm_qa = net_output
-
-                loss_input = init_map, pred_mm_qa, qa_label, qa_loss_valid
-                total_loss, loss = net.module.loss(loss_input)
+                loss_input = \
+                    pred_refs_rank, pred_refs_reg, \
+                    refs_rank_label, refs_rank_weight, refs_rank_loss_valid, \
+                    refs_reg_label, refs_reg_weight, refs_reg_loss_valid
+                total_loss, losses = net.module.loss(loss_input)
                 # for avoid backward the unused params
                 total_loss += 0 * sum(p.sum() for p in net.parameters())
 
                 total_loss.backward()
 
                 total_loss_sum += total_loss.item()
-                mm_qa_loss_sum += loss.item()
+                refs_rank_loss_sum += losses[0].item()
+                refs_reg_loss_sum += losses[1].item()
 
                 proc_rank = self.cfg.GRANK if self.cfg.MP_STORAGE_SHR['screen'] else self.cfg.LRANK
                 if step % 100 == 0 and proc_rank == 0:
                     logging.info(
-                        '[epoch: {}][step: {} | {}] - [total: {:.4f}][mm_qa: {:.4f}]'.format(
-                            epoch + 1, step, len(train_loader), total_loss.item(), loss.item()))
+                        '[epoch: {}][step: {} | {}] - [total: {:.4f}][refs_rank: {:.4f}][refs_reg: {:.4f}]'.format(
+                            epoch + 1, step, len(train_loader), total_loss.item(), losses[0].item(), losses[1].item()))
 
                 # gradient clipping
                 if self.cfg.NET_GRAD_CLIP > 0:
@@ -192,25 +181,25 @@ class Execution:
 
                 logfile = open(os.path.join(self.cfg.LOG_PATH, (self.cfg.VERSION + '.txt')), 'a+')
                 logfile.write(
-                    '[epoch: {}][lr: {:.7f}]\n[total: {:.4f}][mm_qa: {:.4f}]\n'.format(
+                    '[epoch: {}][lr: {:.7f}]\n[total: {:.4f}][refs_rank: {:.4f}][refs_reg: {:.4f}]\n'.format(
                         epoch_finish, np.array(net_optim.get_lr()).mean(), total_loss_sum / len(train_loader),
-                        mm_qa_loss_sum / len(train_loader)))
+                        refs_rank_loss_sum / len(train_loader), refs_reg_loss_sum / len(train_loader)))
                 logfile.close()
 
             dist.barrier()
 
             total_loss_sum = 0
-            mm_qa_loss_sum = 0
+            refs_rank_loss_sum = 0
+            refs_reg_loss_sum = 0
             grad_norm = np.zeros(len(named_params))
 
             if eval_loader is not None:
-                self.eval(eval_loader, net=net, valid=True, task='vqa')
+                self.eval(eval_loader, net=net)
 
 
-    def eval(self, loader, net=None, valid=False, task='vqa'):
+    def eval(self, loader, net=None):
         init_map = {
             'vocab_size': loader.dataset.vocab_size,
-            'ans_size': loader.dataset.ans_size,
         }
 
         if net is None:
@@ -237,19 +226,88 @@ class Execution:
         loader.sampler.set_shuffle(False)
 
         with torch.no_grad():
-            if task in ['vqa']:
-                vqa_eval(self.cfg, loader, net, valid)
-            elif task in ['itm']:
-                pass
+            orin_reg_weight, orin_reg_bias = None, None
+            if self.cfg.BBOX_NORM:
+                for name, params in net.named_parameters():
+                    if 'mm_refs_head.dense_reg.weight' in name:
+                        orin_reg_weight = copy.deepcopy(params.data)
+                        params.data = params.data * torch.unsqueeze(
+                            torch.from_numpy(np.array(self.cfg.BBOX_NORM_STDS)).to(self.cfg.DEVICE_IDS[0]).float(), 1)
+                    if 'mm_refs_head.dense_reg.bias' in name:
+                        orin_reg_bias = copy.deepcopy(params.data)
+                        params.data = params.data * torch.from_numpy(np.array(self.cfg.BBOX_NORM_STDS)).to(
+                            self.cfg.DEVICE_IDS[0]).float() + torch.from_numpy(np.array(self.cfg.BBOX_NORM_MEANS)).to(
+                            self.cfg.DEVICE_IDS[0]).float()
+
+            conut_acc = 0
+            conut = 0
+            for step, data in enumerate(loader):
+                proc_rank = self.cfg.GRANK if self.cfg.MP_STORAGE_SHR['eval'] else self.cfg.LRANK
+                if step % 10 == 0 and proc_rank == 0:
+                    logging.info('Evaluated [{:.2f} %]'.format(step / len(loader) * 100.))
+
+                text_input_ids, text_mask, imgfeat_input, imgfeat_mask, imgfeat_bbox, \
+                refs_gt_boxes, refs_img_boxes, refs_img_shape, \
+                refs_rank_label, refs_rank_weight, refs_rank_loss_valid, \
+                refs_reg_label, refs_reg_weight, refs_reg_loss_valid = data
+
+                text_input_ids = text_input_ids.to(self.cfg.DEVICE_IDS[0])
+                text_mask = text_mask.to(self.cfg.DEVICE_IDS[0])
+                imgfeat_input = imgfeat_input.to(self.cfg.DEVICE_IDS[0])
+                imgfeat_mask = imgfeat_mask.to(self.cfg.DEVICE_IDS[0])
+                imgfeat_bbox = imgfeat_bbox.to(self.cfg.DEVICE_IDS[0])
+
+                net_input = (text_input_ids, text_mask, imgfeat_input, imgfeat_mask, imgfeat_bbox)
+                net_output = net(net_input)
+                pooled_output, text_output, imgfeat_output, pred_refs_rank, pred_refs_reg = net_output
+                refs_gt_boxes, refs_img_boxes, refs_img_shape = refs_gt_boxes.numpy(), refs_img_boxes.numpy(), refs_img_shape.numpy()
+                pred_refs_rank, pred_refs_reg = pred_refs_rank.cpu().data.numpy(), pred_refs_reg.cpu().data.numpy()
+
+                bbox_reg = bbox_transform_inv(
+                    refs_img_boxes.reshape(-1, 4), pred_refs_reg.reshape(-1, 4)).reshape(-1, self.cfg.PAD_MAX['image'], 4)
+                arg_pred_refs_rank = np.argmax(pred_refs_rank, axis=1)
+
+                for step_ix in range(pred_refs_rank.shape[0]):
+                    cliped_bbox_reg_ix = clip_boxes(bbox_reg[step_ix], refs_img_shape[step_ix])
+                    overlaps = bbox_overlaps(
+                        np.ascontiguousarray(cliped_bbox_reg_ix[arg_pred_refs_rank[step_ix]][np.newaxis, :], dtype=np.float),
+                        np.ascontiguousarray(refs_gt_boxes[step_ix], dtype=np.float))[:, 0]
+                    conut += 1
+                    conut_acc += int(overlaps[0] >= self.cfg.OVERLAP_THRESHOLD)
+
+            if self.cfg.BBOX_NORM:
+                for name, params in net.named_parameters():
+                 if 'mm_refs_head.dense_reg.weight' in name:
+                     params.data = orin_reg_weight
+                 if 'mm_refs_head.dense_reg.bias' in name:
+                     params.data = orin_reg_bias
+
+            conut_acc = torch.tensor([conut_acc]).to(self.cfg.DEVICE_IDS[0])
+            torch.distributed.all_reduce(conut_acc)
+            conut_acc = conut_acc.item()
+
+            conut = torch.tensor([conut]).to(self.cfg.DEVICE_IDS[0])
+            torch.distributed.all_reduce(conut)
+            conut = conut.item()
+
+            accuracy = conut_acc / float(conut) * 100.
+            proc_rank = self.cfg.GRANK if self.cfg.MP_STORAGE_SHR['eval'] else self.cfg.LRANK
+            if proc_rank == 0:
+                logging.info("Overall Accuracy is: %.02f\n\n" % (accuracy))
+                print('accuracy = ' + str(accuracy) + ' %')
+                logfile = open(os.path.join(self.cfg.LOG_PATH, (self.cfg.VERSION + '.txt')), 'a+')
+                logfile.write("Overall Accuracy is: %.02f\n\n" % (accuracy))
+                logfile.close()
 
     def run(self):
+        spacy_tool = None
 
         if self.RUN_MODE in ['train']:
             train_text_segment = None
             if self.cfg.SEGMENT_TEXT:
                 train_text_segment = TextSegment(self.cfg, self.RUN_MODE)
 
-            train_dataset = DataSet(self.cfg, self.RUN_MODE, text_segment=train_text_segment)
+            train_dataset = DataSet(self.cfg, self.RUN_MODE, text_segment=train_text_segment, spacy_tool=spacy_tool)
             train_sampler = SubsetDistributedSampler(train_dataset, shuffle=True)
             train_loader = torch.utils.data.DataLoader(
                 train_dataset,
@@ -265,7 +323,7 @@ class Execution:
                 if self.cfg.SEGMENT_TEXT:
                     eval_text_segment = TextSegment(self.cfg, 'val')
 
-                eval_dataset = DataSet(self.cfg, 'val', text_segment=eval_text_segment)
+                eval_dataset = DataSet(self.cfg, 'val', text_segment=eval_text_segment, spacy_tool=spacy_tool)
                 eval_sampler = SubsetDistributedSampler(eval_dataset, shuffle=False)
                 eval_loader = torch.utils.data.DataLoader(
                     eval_dataset,
@@ -282,7 +340,7 @@ class Execution:
             if self.cfg.SEGMENT_TEXT:
                 eval_text_segment = TextSegment(self.cfg, self.RUN_MODE)
 
-            eval_dataset = DataSet(self.cfg, self.RUN_MODE, text_segment=eval_text_segment)
+            eval_dataset = DataSet(self.cfg, self.RUN_MODE, text_segment=eval_text_segment, spacy_tool=spacy_tool)
             eval_sampler = SubsetDistributedSampler(eval_dataset, shuffle=False)
             eval_loader = torch.utils.data.DataLoader(
                 eval_dataset,
@@ -291,7 +349,7 @@ class Execution:
                 num_workers=self.cfg.NUM_WORKERS
             )
 
-            self.eval(eval_loader, valid=self.RUN_MODE in ['val'])
+            self.eval(eval_loader)
 
 
 def mp_entrance(local_rank, world_size, args, __C):
