@@ -6,7 +6,7 @@
 
 This repository contains source code necessary to reproduce the results presented in our paper [ROSITA: Enhancing Vision-and-Language Semantic Alignments via Cross- and Intra-modal Knowledge Integration](https://arxiv.org/abs/2004.06165).
 
-<img src="misc\rosita.PNG" width="900"> 
+<img src="misc\rosita.png" width="900"> 
 
 ## Performance
 
