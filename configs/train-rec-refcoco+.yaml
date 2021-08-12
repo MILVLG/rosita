@@ -1,0 +1,52 @@
+VERSION: train-refcoco+-1
+RUN_MODE: train
+DATASET_ROOTPATH: datasets
+OUTPATH: outputs
+
+# Workers and batch size
+NUM_WORKERS: 8
+
+# Load and save ckpt
+CKPT_FILE: ckpts/rosita-base.pkl
+
+CKPT_SAVE_MAP:
+  mm_refs_head: mm_refs_head
+
+# Datasets
+DATASET_LIST:
+  train:
+    - refcoco+:train
+  val:
+    - refcoco+:val
+  test:
+    # - refcoco+:val
+    # - refcoco+:testA
+    - refcoco+:testB
+
+# Features
+IMGFEAT_LIST:
+  - coco:butd_res101_36-36_i32w_pyt
+
+# Refs Params
+BBOX_NORM: True
+OVERLAP_THRESHOLD: 0.5
+
+# Model Params
+PAD_MAX:
+  text: 20
+  image: 36
+
+TASKS:
+  mm:
+    - refs-rank
+    - refs-reg
+
+# Optimizer Params
+NET_OPTIM: warmup_adam
+NET_OPTIM_WARMUP: True
+NET_LR_BASE: 0.00005
+NET_WEIGHT_DECAY: 0
+NET_GRAD_CLIP: 1.
+NET_LR_DECAY_R: 0.1
+NET_LR_DECAY_LIST: [6, 8]
+WARMUP_EPOCHS: 1

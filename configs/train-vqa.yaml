@@ -1,0 +1,41 @@
+VERSION: train-vqa-1
+RUN_MODE: train
+DATASET_ROOTPATH: datasets
+OUTPATH: outputs
+
+# Workers and batch size
+NUM_WORKERS: 8
+
+# Load ckpt
+CKPT_FILE: ckpts/rosita-base.pkl
+
+CKPT_SAVE_MAP:
+  mm_qa_head: mm_qa_head
+
+# Datasets
+DATASET_LIST:
+  train:
+    - 'vqa:train'
+    - 'vqa:val'
+  val:
+    - 'vqa:minival'
+  test:
+    - 'vqa:test'
+
+# Features
+IMGFEAT_LIST:
+  - coco:butd_res101_36-36_i32w_pyt
+
+# Model Params
+PAD_MAX:
+  text: 20
+  image: 36
+
+TASKS:
+  mm:
+    - qa
+
+# Optimizer Params
+NET_LR_BASE: 0.00005
+NET_LR_DECAY_LIST: [6, 9]
+WARMUP_EPOCHS: 3
