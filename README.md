@@ -60,7 +60,22 @@ This repository contains source code necessary to reproduce the results presente
 
 ## Installation
 
-Check [INSTALL.md](INSTALL.md) for installation instructions.
+### Requirements
+- Pytorch 1.4
+- torchvision 0.5.0
+- Cython
+
+### Setup
+```bash
+# git clone
+
+cd rosita/rosita/utils/rec
+
+python setup.py build
+
+cp build/lib*/bbox.cpython*.so .
+```
+
 
 ## Dataset Setup
 
