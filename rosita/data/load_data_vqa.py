@@ -3,8 +3,8 @@ import json, re, torch, logging, collections, copy, math, os
 import torch.utils.data as Data
 import torch.nn as nn
 
-from rosita.utils.answer_punct import preprocess_answer
-from rosita.utils.tokenizer import BertTokenizer
+from utils.answer_punct import preprocess_answer
+from utils.tokenizer import BertTokenizer
 
 
 class DataSet(Data.Dataset):
@@ -150,7 +150,7 @@ class DataSet(Data.Dataset):
 
     @staticmethod
     def load_ans_vocab():
-        return json.load(open('rosita/vqa/answer_vocab.json', 'r'))
+        return json.load(open('rosita/utils/vqa/answer_vocab.json', 'r'))
 
     
     @staticmethod

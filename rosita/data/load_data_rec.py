@@ -1,9 +1,9 @@
 import numpy as np
 import json, re, torch, logging, collections, copy, os
 import torch.utils.data as Data
-from rosita.utils.tokenizer import BertTokenizer
-from rosita.refs.bbox import bbox_overlaps
-from rosita.refs.bbox_transform import bbox_transform
+from utils.tokenizer import BertTokenizer
+from utils.rec.bbox import bbox_overlaps
+from utils.rec.bbox_transform import bbox_transform
 
 
 class DataSet(Data.Dataset):

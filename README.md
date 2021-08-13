@@ -42,48 +42,15 @@ This repository contains source code necessary to reproduce the results presente
 <td align="center" nowrap><sup><sub>88.90 | 98.10 | 99.30</sub></sup></td>
 </tr>
 <tr>
-<td align="center" nowrap><sup><sub>SOTA-O</sub></sup></td>
-<td align="center" nowrap><sup><sub>73.16 | 73.44</sub></sup></td>
-<td align="center" nowrap><sup><sub>- | - | -</sub></sup></td>
-<td align="center" nowrap><sup><sub>- | - | -</sub></sup></td>
-<td align="center" nowrap><sup><sub>- | -</sub></sup></td>
-<td align="center" nowrap><sup><sub>54.00 | 80.80 | 88.50</sub></sup></td>
-<td align="center" nowrap><sup><sub>70.00 | 91.10 | 95.50</sub></sup></td>
-<td align="center" nowrap><sup><sub>- | - | -</sub></sup></td>
-<td align="center" nowrap><sup><sub>- | - | -</sub></sup></td>
-</tr>
-<tr>
-<td align="center" nowrap><sup><sub>SOTA-V</sub></sup></td>
+<td align="center" nowrap><sup><sub>SoTA-base</sub></sup></td>
 <td align="center" nowrap><sup><sub>73.59 | 73.67</sub></sup></td>
 <td align="center" nowrap><sup><sub>81.56 | 87.40 | 74.48</sub></sup></td>
 <td align="center" nowrap><sup><sub>76.05 | 81.65 | 65.70</sub></sup></td>
 <td align="center" nowrap><sup><sub>75.90 | 75.93</sub></sup></td>
-<td align="center" nowrap><sup><sub>- | - | -</sub></sup></td>
-<td align="center" nowrap><sup><sub>- | - | -</sub></sup></td>
+<td align="center" nowrap><sup><sub>54.00 | 80.80 | 88.50</sub></sup></td>
+<td align="center" nowrap><sup><sub>70.00 | 91.10 | 95.50</sub></sup></td>
 <td align="center" nowrap><sup><sub>74.74 | 92.86 | 95.82</sub></sup></td>
 <td align="center" nowrap><sup><sub>86.60 | 97.90 | 99.20</sub></sup></td>
-</tr>
-<tr>
-<td align="center" nowrap><sup><sub>SOTA-E</sub></sup></td>
-<td align="center" nowrap><sup><sub>72.62 | 72.85</sub></sup></td>
-<td align="center" nowrap><sup><sub>- | - | -</sub></sup></td>
-<td align="center" nowrap><sup><sub>74.02 | 80.33 | 64.74</sub></sup></td>
-<td align="center" nowrap><sup><sub>- | -</sub></sup></td>
-<td align="center" nowrap><sup><sub>- | - | -</sub></sup></td>
-<td align="center" nowrap><sup><sub>- | - | -</sub></sup></td>
-<td align="center" nowrap><sup><sub>74.44 | 92.72 | 95.94</sub></sup></td>
-<td align="center" nowrap><sup><sub>86.70 | 97.80 | 99.00</sub></sup></td>
-</tr>
-<tr>
-<td align="center" nowrap><sup><sub>SOTA-U</sub></sup></td>
-<td align="center" nowrap><sup><sub>72.70 | 72.91</sub></sup></td>
-<td align="center" nowrap><sup><sub>81.24 | 86.48 | 73.94</sub></sup></td>
-<td align="center" nowrap><sup><sub>75.31 | 81.30 | 65.68</sub></sup></td>
-<td align="center" nowrap><sup><sub>74.31 | 74.51</sub></sup></td>
-<td align="center" nowrap><sup><sub>50.33 | 78.52 | 87.16</sub></sup></td>
-<td align="center" nowrap><sup><sub>64.40 | 87.40 | 93.08</sub></sup></td>
-<td align="center" nowrap><sup><sub>72.52 | 92.36 | 96.08</sub></sup></td>
-<td align="center" nowrap><sup><sub>85.90 | 97.10 | 98.80</sub></sup></td>
 </tr>
 
 

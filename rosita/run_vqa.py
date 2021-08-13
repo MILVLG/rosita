@@ -4,16 +4,16 @@ import torch.nn as nn
 import torch.optim as Optim
 import numpy as np
 
-from rosita.config.cfg import Cfg
-from rosita.vqa.eval import vqa_eval
+from config.cfg import Cfg
+from utils.vqa.eval import vqa_eval
 import torch.multiprocessing as mp
-from rosita.modeling.vqa import Net
+from modeling.vqa import Net
 import torch.distributed as dist
-from rosita.data.load_data_vqa import DataSet
-from rosita.utils.optimizer import BertAdam, WarmupOptimizer
-from rosita.utils.sampler import SubsetDistributedSampler
-from rosita.utils.segment import TextSegment
-from rosita.utils.weight_filter import qa_cls_weight_filter
+from data.load_data_vqa import DataSet
+from utils.optimizer import BertAdam, WarmupOptimizer
+from utils.sampler import SubsetDistributedSampler
+from utils.segment import TextSegment
+from utils.weight_filter import qa_cls_weight_filter
 from torch.nn.parallel import DistributedDataParallel as DDP
 
 

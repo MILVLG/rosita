@@ -1,6 +1,6 @@
 import os, datetime, argparse
-from rosita.modeling.itr import Net
-from rosita.config.cfg import Cfg
+from modeling.itr import Net
+from config.cfg import Cfg
 import yaml
 import torch, datetime, logging, random, math
 import torch.nn as nn
@@ -9,10 +9,10 @@ import torch.multiprocessing as mp
 import numpy as np
 
 import torch.distributed as dist
-from rosita.data.load_data_itr import DataSet, DataSet_Neg
-from rosita.utils.optimizer import BertAdam, WarmupOptimizer
-from rosita.utils.sampler import SubsetDistributedSampler
-from rosita.utils.segment import TextSegment
+from data.load_data_itr import DataSet, DataSet_Neg
+from utils.optimizer import BertAdam, WarmupOptimizer
+from utils.sampler import SubsetDistributedSampler
+from utils.segment import TextSegment
 
 from torch.nn.parallel import DistributedDataParallel as DDP
 

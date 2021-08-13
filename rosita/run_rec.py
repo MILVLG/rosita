@@ -5,16 +5,16 @@ import torch.multiprocessing as mp
 import numpy as np
 
 import os, argparse, yaml
-from rosita.config.cfg import Cfg
-from rosita.modeling.rec import Net
+from config.cfg import Cfg
+from modeling.rec import Net
 
 import torch.distributed as dist
-from rosita.data.load_data_rec import DataSet
-from rosita.utils.optimizer import BertAdam, WarmupOptimizer
-from rosita.utils.sampler import SubsetDistributedSampler
-from rosita.utils.segment import TextSegment
-from rosita.refs.bbox_transform import clip_boxes, bbox_transform_inv
-from rosita.refs.bbox import bbox_overlaps
+from data.load_data_rec import DataSet
+from utils.optimizer import BertAdam, WarmupOptimizer
+from utils.sampler import SubsetDistributedSampler
+from utils.segment import TextSegment
+from utils.rec.bbox_transform import clip_boxes, bbox_transform_inv
+from utils.rec.bbox import bbox_overlaps
 
 from torch.nn.parallel import DistributedDataParallel as DDP
 

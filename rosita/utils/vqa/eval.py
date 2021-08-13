@@ -2,8 +2,8 @@ import logging, json, os
 import numpy as np
 import torch.distributed as dist
 
-from rosita.vqa.vqa import VQA
-from rosita.vqa.vqaEval import VQAEval
+from utils.vqa.vqa import VQA
+from utils.vqa.vqaEval import VQAEval
 
 
 def vqa_eval(__C, loader, net, valid=False):

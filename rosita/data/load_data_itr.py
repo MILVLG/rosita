@@ -1,7 +1,7 @@
 import numpy as np
 import json, re, torch, logging, collections, random, copy
 import torch.utils.data as Data
-from rosita.utils.tokenizer import BertTokenizer
+from utils.tokenizer import BertTokenizer
 import os
 
 
