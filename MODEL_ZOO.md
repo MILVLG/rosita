@@ -50,12 +50,18 @@
 </tbody></table>
 
 
+## Pre-trained Models
+We provide pre-trained Rosita models.
+- [rosita-base](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EYTZaPGm3DRBsbWDSJA8IQMB_-me1J7JAIqyuxzzs1dMyw?e=RfFU56?download=1)
+
 ## VQA
 Script to finetune for ROSITA base model on VQAv2.
 ```bash
 bash scripts/train-vqa-vqav2.sh
 ```
 
+We also provide the checkpoints finetuned on downstream tasks for run evaluation directly.
+- [vqa-vqav2-base](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EVuxUtRFkRZJhjKTg9w8sesBKlM3hgcbZxE2nzSRbbAhRA?e=XNAH9v?download=1)
 Script to test for ROSITA base model on VQAv2.
 ```bash
 bash scripts/test-vqa-vqav2.sh
@@ -67,6 +73,8 @@ Script to finetune for ROSITA base model on RefCOCO.
 bash scripts/train-rec-refcoco.sh
 ```
 
+We also provide the checkpoints finetuned on downstream tasks for run evaluation directly.
+- [rec-refcoco-base](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETr_J0Ak8L9Phc8JPQG_pZYBMqG35EdwfuFTZUet1vrKSQ?e=tWPNId?download=1)
 Script to test for ROSITA base model on RefCOCO.
 ```bash
 bash scripts/test-rec-refcoco.sh
@@ -77,6 +85,8 @@ Script to finetune for ROSITA base model on RefCOCOplus.
 bash scripts/train-rec-refcoco+.sh
 ```
 
+We also provide the checkpoints finetuned on downstream tasks for run evaluation directly.
+- [rec-refcocoplus-base](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ERCWoT4cpVNJr9OOXoNjdHQB6WelAAtAMj9rbE8DAoec0w?e=EhjHzT?download=1)
 Script to test for ROSITA base model on RefCOCOplus.
 ```bash
 bash scripts/test-rec-refcoco+.sh
@@ -87,6 +97,8 @@ Script to finetune for ROSITA base model on RefCOCOg.
 bash scripts/train-rec-refcocog.sh
 ```
 
+We also provide the checkpoints finetuned on downstream tasks for run evaluation directly.
+- [rec-refcocog-base](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EXxpfotSwO1Jgu5POVbLQ24BNUPHWfdCS07UyNJNHWP4vQ?e=VzcuhU?download=1)
 Script to test for ROSITA base model on RefCOCOg.
 ```bash
 bash scripts/test-rec-refcocog.sh
@@ -99,6 +111,20 @@ Script to finetune for ROSITA base model on ITR-COCO.
 bash scripts/train-itr-coco.sh
 ```
 
+We also provide the checkpoints finetuned on downstream tasks for run evaluation directly.
+- [itr-coco-base](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/Eet3nwx-RIVLt3v17tzsIhIBOnsTapsUVGR5HI2Hg_VKNQ?e=O2S19T?download=1)
+Script to test for ROSITA base model on ITR-COCO.
+```bash
+bash scripts/test-itr-coco.sh
+```
+
+Script to finetune for ROSITA base model on ITR-Flickr.
+```bash
+bash scripts/train-itr-flickr.sh
+```
+
+We also provide the checkpoints finetuned on downstream tasks for run evaluation directly.
+- [itr-flickr-base](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EYsabcbcrflOinC4LyuAfzYBaCucZZ6wv7e7k1QgTG32JA?e=jgYBOR?download=1)
 Script to test for ROSITA base model on ITR-Flickr.
 ```bash
 bash scripts/test-itr-flickr.sh
