@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from .rosita import LayerNorm, TextEmbeddings, VisualEmbeddings, Backbone, Pooler, gelu
+from modeling.transformer import LayerNorm, TextEmbeddings, VisualEmbeddings, Backbone, Pooler, gelu
 
 
 class MmRefsHead(nn.Module):

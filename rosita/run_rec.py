@@ -6,7 +6,7 @@ import numpy as np
 
 import os, argparse, yaml
 from config.cfg import Cfg
-from modeling.rec import Net
+from modeling.finetune_tasks.rec import Net
 
 import torch.distributed as dist
 from data.load_data_rec import DataSet
@@ -178,6 +178,8 @@ class Execution:
                 save_model_path = os.path.join(self.cfg.CKPT_SAVE_PATH, (self.cfg.VERSION + '_epoch' + str(
                     epoch_finish) + '.pkl'))
                 torch.save(state, save_model_path)
+                last_model_path = os.path.join(self.cfg.CKPT_SAVE_PATH, 'last_ckpt.pkl')
+                torch.save(state, last_model_path)
 
                 logfile = open(os.path.join(self.cfg.LOG_PATH, (self.cfg.VERSION + '.txt')), 'a+')
                 logfile.write(
@@ -373,6 +375,7 @@ def parse_args():
     parser.add_argument('--MP', dest='MASTER_PORT', default='15595', type=str)
     parser.add_argument('--gpu', dest='GPU', default='0, 1', type=str)
     parser.add_argument('--config', dest='config_file', default='', type=str)
+    parser.add_argument('--resume', action='store_true')
 
     args = parser.parse_args()
     return args
@@ -390,7 +393,7 @@ if __name__ == '__main__':
 
     args_dict = {**yaml_dict, **args_dict}
     __C.add_args(yaml_dict)
-    __C.proc()
+    __C.proc(args.resume)
     print(__C)
     os.environ['CUDA_VISIBLE_DEVICES'] = args.GPU
     mp.spawn(

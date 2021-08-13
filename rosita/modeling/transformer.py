@@ -152,14 +152,3 @@ class Pooler(nn.Module):
         pooled_output = self.dense(first_token_tensor)
         pooled_output = torch.tanh(pooled_output)
         return pooled_output
-
-
-class MmITMHead(nn.Module):
-    def __init__(self, cfg):
-        super(MmITMHead, self).__init__()
-        self.cfg = cfg
-        self.dense = nn.Linear(cfg.HSIZE, 2)
-    
-    def forward(self, x_pooled):
-        pred = self.dense(x_pooled)
-        return pred

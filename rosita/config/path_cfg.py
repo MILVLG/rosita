@@ -54,8 +54,9 @@ class Path:
         self.LOG_PATH = os.path.join(self.OUTPATH, 'logs')
         os.system('mkdir -p ' + self.LOG_PATH)
         
-        self.CKPT_SAVE_PATH = os.path.join(self.OUTPATH, 'ckpts')
-        os.system('mkdir -p ' + self.CKPT_SAVE_PATH)
+        if self.RUN_MODE in ['train']:
+            self.CKPT_SAVE_PATH = os.path.join(self.OUTPATH, 'ckpts')
+            os.system('mkdir -p ' + self.CKPT_SAVE_PATH)
 
         self.BERT_VOCAB_PATH = 'rosita/utils/bert_vocabs/vocab.txt'
 

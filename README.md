@@ -11,7 +11,6 @@ This repository contains source code necessary to reproduce the results presente
 ## Performance
 
 <table><tbody>
-<!-- START END-TO-END KEYPOINTS TABLE -->
 <!-- TABLE HEADER -->
 <!-- Info: we use wrap text in <sup><sub></sub><sup> to make is small -->
 <th align="center"><sup><sub>Tasks</sub></sup></th>
@@ -53,9 +52,6 @@ This repository contains source code necessary to reproduce the results presente
 <td align="center" nowrap><sup><sub>86.60 | 97.90 | 99.20</sub></sup></td>
 </tr>
 
-
-
-<!-- END END-TO-END KEYPOINTS TABLE -->
 </tbody></table>
 
 

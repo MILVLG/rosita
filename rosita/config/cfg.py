@@ -1,4 +1,4 @@
-import torch, logging
+import torch, logging, os
 import torch.nn as nn
 from .path_cfg import Path
 from types import MethodType
@@ -195,7 +195,7 @@ class Cfg(Path):
             else:
                 setattr(self, arg, args_dict[arg])
     
-    def proc(self):
+    def proc(self, resume):
         assert self.RUN_MODE in ['train', 'val', 'test']
 
         self.proc_base_path(self.VERSION)
@@ -204,6 +204,11 @@ class Cfg(Path):
             self.proc_qa_path()
 
         self.BATCH_ALL_GPUS = self.BATCH_SIZE * self.WORLD_SIZE
+
+        if resume:
+            self.CKPT_FILE = os.path.join(self.CKPT_SAVE_PATH, 'last_ckpt.pkl')
+            self.RESUME_FROM_CKPT_FILE = True
+            logging.info('Resume from last epoch')
 
         if self.RESUME_FROM_CKPT_FILE:
             self.CKPT_LOAD_MAP['epoch'] = 'epoch'

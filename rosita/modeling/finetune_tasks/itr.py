@@ -1,7 +1,17 @@
 import torch
 import torch.nn as nn
-from .rosita import TextEmbeddings, VisualEmbeddings, Backbone, Pooler, MmITMHead, LayerNorm
+from modeling.transformer import TextEmbeddings, VisualEmbeddings, Backbone, Pooler, LayerNorm
 
+
+class MmITMHead(nn.Module):
+    def __init__(self, cfg):
+        super(MmITMHead, self).__init__()
+        self.cfg = cfg
+        self.dense = nn.Linear(cfg.HSIZE, 2)
+    
+    def forward(self, x_pooled):
+        pred = self.dense(x_pooled)
+        return pred
 
 class Net(nn.Module):
     def __init__(self, cfg, init_map):

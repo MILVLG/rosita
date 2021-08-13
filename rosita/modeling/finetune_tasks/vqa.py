@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from .rosita import TextEmbeddings, VisualEmbeddings, Backbone, Pooler, gelu, LayerNorm
+from modeling.transformer import TextEmbeddings, VisualEmbeddings, Backbone, Pooler, gelu, LayerNorm
 
 
 class MmQAHead(nn.Module):
