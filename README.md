@@ -82,9 +82,13 @@ cp build/lib*/bbox.cpython*.so .
 
 To download the required datasets for ROSITA, please check [DATASET.md](DATASET.md) for details. 
 
-## Model Zoo
+## Pretrain
 
-Check [MODEL_ZOO.md](MODEL_ZOO.md) for the scripts and provided checkpoints to run the finetuning on downstream tasks.
+Check [PRETRAIN.md](PRETRAIN.md) for the provided pretrained checkpoints to run the finetuning on downstream tasks. We will provide the scripts to run the pretraining tasks later. 
+
+## Finetune
+
+Check [FINETUNE.md](FINETUNE.md) for the scripts and provided checkpoints to run the finetuning on downstream tasks.
 
 
 ## Citations
