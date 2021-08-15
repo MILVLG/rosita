@@ -8,7 +8,7 @@ We provide the scripts as well as the trained models on the downstream tasks as 
 
 - <a href='#VQA'>Visual Question Answering (VQA)</a>
 - <a href='#REC'>Referring Expression Comhrehension (REC)</a>
-- <a href='#Image/Text Retrieval'>Image-Text Retrieval (ITR)</a>
+- <a href='#ITR'>Image-Text Retrieval (ITR)</a>
 
 
 
@@ -49,14 +49,14 @@ We also provide the checkpoint model to reproduce the following results on `test
 <tr>
 <td align="center" nowrap>ROSITA-base</td>
 <td align="center" valign="middle">73.91</td>
-<td align="center" valign="middle">xx.xx</td>
-<td align="center" valign="middle">xx.xx</td>
-<td align="center" valign="middle">xx.xx</td>
+<td align="center" valign="middle">89.91</td>
+<td align="center" valign="middle">56.07</td>
+<td align="center" valign="middle">64.29</td>
 <td align="center" valign="middle">73.97</td>
-<td align="center" valign="middle">xx.xx</td>
-<td align="center" valign="middle">xx.xx</td>
-<td align="center" valign="middle">xx.xx</td>
-<td align="center" valign="middle"><a href="https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EVuxUtRFkRZJhjKTg9w8sesBKlM3hgcbZxE2nzSRbbAhRA?e=XNAH9v?download=1">model</a></td>
+<td align="center" valign="middle">89.76</td>
+<td align="center" valign="middle">55.81</td>
+<td align="center" valign="middle">64.39</td>
+<td align="center" valign="middle"><a href="https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EVuxUtRFkRZJhjKTg9w8sesBKlM3hgcbZxE2nzSRbbAhRA?download=1">model</a></td>
 </tr>
 </table>
 
@@ -92,10 +92,10 @@ We also provide the checkpoint model to reproduce the following results on `val`
 </tr>
 <tr>
 <td align="center" nowrap>ROSITA-base</td>
-<td align="center" valign="middle">73.91</td>
-<td align="center" valign="middle">xx.xx</td>
-<td align="center" valign="middle">xx.xx</td>
-<td align="center" valign="middle"><a href="https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EVuxUtRFkRZJhjKTg9w8sesBKlM3hgcbZxE2nzSRbbAhRA?e=XNAH9v?download=1">model</a></td>
+<td align="center" valign="middle">84.79</td>
+<td align="center" valign="middle">87.99</td>
+<td align="center" valign="middle">78.28</td>
+<td align="center" valign="middle"><a href="https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETr_J0Ak8L9Phc8JPQG_pZYBMqG35EdwfuFTZUet1vrKSQ?download=1">model</a></td>
 </tr>
 </table>
 
@@ -127,10 +127,10 @@ We also provide the checkpoint model to reproduce the following results on `val`
 </tr>
 <tr>
 <td align="center" nowrap>ROSITA-base</td>
-<td align="center" valign="middle">73.91</td>
-<td align="center" valign="middle">xx.xx</td>
-<td align="center" valign="middle">xx.xx</td>
-<td align="center" valign="middle"><a href="https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EVuxUtRFkRZJhjKTg9w8sesBKlM3hgcbZxE2nzSRbbAhRA?e=XNAH9v?download=1">model</a></td>
+<td align="center" valign="middle">76.06</td>
+<td align="center" valign="middle">82.01</td>
+<td align="center" valign="middle">67.40</td>
+<td align="center" valign="middle"><a href="https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ERCWoT4cpVNJr9OOXoNjdHQB6WelAAtAMj9rbE8DAoec0w?download=1">model</a></td>
 </tr>
 </table>
 
@@ -161,14 +161,14 @@ We also provide the checkpoint model to reproduce the following results on `val`
 </tr>
 <tr>
 <td align="center" nowrap>ROSITA-base</td>
-<td align="center" valign="middle">73.91</td>
-<td align="center" valign="middle">xx.xx</td>
-<td align="center" valign="middle"><a href="https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EVuxUtRFkRZJhjKTg9w8sesBKlM3hgcbZxE2nzSRbbAhRA?e=XNAH9v?download=1">model</a></td>
+<td align="center" valign="middle">78.23</td>
+<td align="center" valign="middle">78.25</td>
+<td align="center" valign="middle"><a href="https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EXxpfotSwO1Jgu5POVbLQ24BNUPHWfdCS07UyNJNHWP4vQ?download=1">model</a></td>
 </tr>
 </table>
 
 
-## Image/Text Retrieval
+## ITR
 
 ### ITR-COCO
 
@@ -201,13 +201,13 @@ We also provide the checkpoint model to reproduce the following results on `test
 </tr>
 <tr>
 <td align="center" nowrap>ROSITA-base</td>
-<td align="center" valign="middle">73.91</td>
-<td align="center" valign="middle">xx.xx</td>
-<td align="center" valign="middle">xx.xx</td>
-<td align="center" valign="middle">73.91</td>
-<td align="center" valign="middle">xx.xx</td>
-<td align="center" valign="middle">xx.xx</td>
-<td align="center" valign="middle"><a href="https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EVuxUtRFkRZJhjKTg9w8sesBKlM3hgcbZxE2nzSRbbAhRA?e=XNAH9v?download=1">model</a></td>
+<td align="center" valign="middle">54.40</td>
+<td align="center" valign="middle">80.92</td>
+<td align="center" valign="middle">88.60</td>
+<td align="center" valign="middle">71.26</td>
+<td align="center" valign="middle">91.62</td>
+<td align="center" valign="middle">95.58</td>
+<td align="center" valign="middle"><a href="https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/Eet3nwx-RIVLt3v17tzsIhIBOnsTapsUVGR5HI2Hg_VKNQ?download=1">model</a></td>
 </tr>
 </table>
 
@@ -242,12 +242,12 @@ We also provide the checkpoint model to reproduce the following results on `test
 </tr>
 <tr>
 <td align="center" nowrap>ROSITA-base</td>
-<td align="center" valign="middle">73.91</td>
-<td align="center" valign="middle">xx.xx</td>
-<td align="center" valign="middle">xx.xx</td>
-<td align="center" valign="middle">73.91</td>
-<td align="center" valign="middle">xx.xx</td>
-<td align="center" valign="middle">xx.xx</td>
-<td align="center" valign="middle"><a href="https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EVuxUtRFkRZJhjKTg9w8sesBKlM3hgcbZxE2nzSRbbAhRA?e=XNAH9v?download=1">model</a></td>
+<td align="center" valign="middle">74.08</td>
+<td align="center" valign="middle">92.44</td>
+<td align="center" valign="middle">96.08</td>
+<td align="center" valign="middle">88.90</td>
+<td align="center" valign="middle">98.10</td>
+<td align="center" valign="middle">99.30</td>
+<td align="center" valign="middle"><a href="https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EYsabcbcrflOinC4LyuAfzYBaCucZZ6wv7e7k1QgTG32JA?download=1">model</a></td>
 </tr>
 </table>

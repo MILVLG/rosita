@@ -14,5 +14,5 @@ We provide the pretrained models to support the finetuning on downstream tasks. 
 
 |    name     | model size |                           download                           |
 | :---------: | :--------: | :----------------------------------------------------------: |
-| ROSITA-base |    116M    | [model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EYTZaPGm3DRBsbWDSJA8IQMB_-me1J7JAIqyuxzzs1dMyw?e=RfFU56?download=1) |
+| ROSITA-base |    116M    | [model](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EYTZaPGm3DRBsbWDSJA8IQMB_-me1J7JAIqyuxzzs1dMyw?download=1) |
 
