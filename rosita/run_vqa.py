@@ -1,3 +1,8 @@
+# -------------------------------------------------------- 
+ # ROSITA
+ # Licensed under The Apache License 2.0 [see LICENSE for details] 
+ # Written by Yuhao Cui
+ # -------------------------------------------------------- 
 import os, datetime, argparse, yaml
 import torch, logging, random
 import torch.nn as nn
