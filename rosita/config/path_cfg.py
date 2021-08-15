@@ -50,6 +50,14 @@ class Path:
             'refcoco+': os.path.join(dataset_rootpath, (self.DATASET_PATHMAP['refcoco+'] + '/formatted_data_refcoco+.json'.format(postfix))),
             'refcocog': os.path.join(dataset_rootpath, (self.DATASET_PATHMAP['refcocog'] + '/formatted_data_refcocog.json'.format(postfix))),
         }
+        self.DATASET_FEATMAP = {
+            'vqa': 'coco',
+            'flickr': 'flickr',
+            'coco': 'coco',
+            'refcoco': 'coco',
+            'refcoco+': 'coco',
+            'refcocog': 'coco',
+        }
 
         self.LOG_PATH = os.path.join(self.OUTPATH, 'logs')
         os.system('mkdir -p ' + self.LOG_PATH)

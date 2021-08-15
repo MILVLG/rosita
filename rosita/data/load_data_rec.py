@@ -1,9 +1,10 @@
 import numpy as np
-import json, re, torch, logging, collections, copy, os
+import json, re, torch, logging, collections, copy, os, base64
 import torch.utils.data as Data
 from utils.tokenizer import BertTokenizer
 from utils.rec.bbox import bbox_overlaps
 from utils.rec.bbox_transform import bbox_transform
+from utils.tsv_file import TSVFile
 
 
 class DataSet(Data.Dataset):
@@ -11,8 +12,21 @@ class DataSet(Data.Dataset):
         self.__C = __C
         self.RUN_MODE = RUN_MODE
         self.text_segment = text_segment
+        assert self.__C.IMGFEAT_FORMAT in ['npz', 'tsv']
+        self.use_tsv = False
+        if self.__C.IMGFEAT_FORMAT == 'tsv':
+            self.use_tsv = True
         logging.info('[dataset: {}] Loader Initializing'.format(RUN_MODE))
 
+        if self.use_tsv:
+            self.tsv_files = {}
+            self.img_feat_offset_maps = {}
+            for dataset_name in self.__C.DATASET_LIST[RUN_MODE]:
+                tset = dataset_name.split(':')[0]
+                fset = self.__C.DATASET_FEATMAP[tset]
+                tsv_file, img_feat_offset_map = self.load_tsv(fset)
+                self.tsv_files[fset] = tsv_file
+                self.img_feat_offset_maps[fset] = img_feat_offset_map
         if text_segment is not None:
             logging.info('Use Text Segment for Memory Efficiency')
         else:
@@ -44,7 +58,25 @@ class DataSet(Data.Dataset):
         # Load image features
         img_src = formatted_data['img_src']
         img_filename = formatted_data['img_file']
-        imgfeat = self.load_npz(img_src, img_filename)
+        if self.use_tsv:
+            tsv_file = self.tsv_files[img_src]
+            img_offset_map = self.img_feat_offset_maps[img_src]
+            img_idx = img_offset_map[img_filename]
+            row = tsv_file.seek(img_idx)
+            imgfeat = {}
+            imgfeat['filename'] = row[0]
+            num_bboxes = int(row[4])
+            imgfeat['x'] = np.frombuffer(base64.b64decode(row[1]), dtype=np.float32).reshape((num_bboxes, -1))
+            imgfeat['image_h'], imgfeat['image_w'] = int(row[2]), int(row[3])
+            imgfeat['num_boxes'] = num_bboxes
+            imgfeat['boxes'] = np.frombuffer(base64.b64decode(row[5]), dtype=np.float32).reshape((num_bboxes, -1))
+            imgfeat['objects_id'] = np.frombuffer(base64.b64decode(row[6]), dtype=np.float32)
+            imgfeat['objects_conf'] = np.frombuffer(base64.b64decode(row[7]), dtype=np.float32)
+            imgfeat['attrs_id'] = np.frombuffer(base64.b64decode(row[8]), dtype=np.float32)
+            imgfeat['attrs_conf'] = np.frombuffer(base64.b64decode(row[9]), dtype=np.float32)
+
+        else:
+            imgfeat = self.load_npz(img_src, img_filename)
 
 
         # Cliping text
@@ -184,6 +216,14 @@ class DataSet(Data.Dataset):
         npz_loaded = np.load(np_file)
 
         return npz_loaded
+    
+
+    def load_tsv(self, img_src):
+        tsv_file = self.__C.IMGFEAT_ROOTPATH_MAP[img_src] + '.tsv'
+        img_feat_offset_map_file = tsv_file.replace(tsv_file.split('/')[-1], 'img_feat_offset_map.json')
+        with open(img_feat_offset_map_file) as f:
+            img_feat_offset_map = json.load(f)
+        return TSVFile(tsv_file), img_feat_offset_map
 
 
     def proc_text(self, text_input):

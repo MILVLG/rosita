@@ -70,6 +70,7 @@ class Cfg(Path):
         self.BBOXFEAT_SIZE = 5
 
         imgfeat_type = 'butd_res101_36-36_i32w_pyt'
+        self.IMGFEAT_FORMAT = 'tsv'
         self.IMGFEAT_LIST = [
             'coco:' + imgfeat_type,
             'flickr:' + imgfeat_type,

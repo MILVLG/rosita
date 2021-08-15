@@ -314,8 +314,8 @@ def parse_args():
     parser.add_argument('--NS', dest='NODE_SIZE', default=1, type=int)
     parser.add_argument('--NI', dest='NODE_ID', default=0, type=int)
     parser.add_argument('--MA', dest='MASTER_ADDR', default='127.0.0.1', type=str)
-    parser.add_argument('--MP', dest='MASTER_PORT', default='15595', type=str)
-    parser.add_argument('--gpu', dest='GPU', default='0, 1', type=str)
+    parser.add_argument('--MP', dest='MASTER_PORT', default='auto', type=str)
+    parser.add_argument('--gpu', dest='GPU', default='0, 1, 2, 3', type=str)
     parser.add_argument('--config', dest='config_file', default='', type=str)
     parser.add_argument('--resume', action='store_true')
 
@@ -338,6 +338,10 @@ if __name__ == '__main__':
     __C.proc(args.resume)
     print(__C)
     os.environ['CUDA_VISIBLE_DEVICES'] = args.GPU
+    if args.MASTER_PORT == 'auto':
+        args.MASTER_PORT = str(random.randint(13390, 17799))
+    print('MASTER_ADDR:', args.MASTER_ADDR)
+    print('MASTER_PORT:', args.MASTER_PORT)
     mp.spawn(
         mp_entrance,
         args=(WORLD_SIZE, args, __C),

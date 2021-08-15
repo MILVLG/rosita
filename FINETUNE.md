@@ -27,9 +27,10 @@ $ bash scripts/test-vqa-vqav2.sh
 
 We also provide the checkpoint model to reproduce the following results on `test-dev` and `test-std` split using the testing script above.
 
+
 <table><tbody>
 <!-- TABLE HEADER -->
-<!-- Info: we use wrap text in <sup><sub></sub><sup> to make is small -->
+
 <th align="center" rowspan="2">Name</th>
 <th align="center" colspan="4">Test-dev</th>
 <th align="center" colspan="4">Test-std</th>
@@ -57,76 +58,196 @@ We also provide the checkpoint model to reproduce the following results on `test
 <td align="center" valign="middle">xx.xx</td>
 <td align="center" valign="middle"><a href="https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EVuxUtRFkRZJhjKTg9w8sesBKlM3hgcbZxE2nzSRbbAhRA?e=XNAH9v?download=1">model</a></td>
 </tr>
-
+</table>
 
 
 ## REC
 
-Script to finetune for ROSITA base model on RefCOCO.
+### RefCOCO
+
+The following script run the finetuning on the `train` split of RefCOCO.
 ```bash
 $ bash scripts/train-rec-refcoco.sh
 ```
 
-We also provide the checkpoints finetuned on downstream tasks for run evaluation directly.
-- [rec-refcoco-base](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETr_J0Ak8L9Phc8JPQG_pZYBMqG35EdwfuFTZUet1vrKSQ?e=tWPNId?download=1)
 
-Script to test for ROSITA base model on RefCOCO.
+As the training stage complete, you may run the following script to run evaluation on the `val/testA/testB` split of RefCOCO. 
 ```bash
 bash scripts/test-rec-refcoco.sh
 ```
 
-Script to finetune for ROSITA base model on RefCOCOplus.
+We also provide the checkpoint model to reproduce the following results on `val` and `testA/B` split using the testing script above.
+
+<table><tbody>
+<!-- TABLE HEADER -->
+
+<th align="center" rowspan="2">Name</th>
+<th align="center" colspan="3">RefCOCO</th>
+<th align="center" rowspan="2">Downloads</th>
+<!-- TABLE BODY -->
+<tr>
+<th align="center" valign="middle">val</th>
+<th align="center" valign="middle">testA</th>
+<th align="center" valign="middle">testB</th>
+</tr>
+<tr>
+<td align="center" nowrap>ROSITA-base</td>
+<td align="center" valign="middle">73.91</td>
+<td align="center" valign="middle">xx.xx</td>
+<td align="center" valign="middle">xx.xx</td>
+<td align="center" valign="middle"><a href="https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EVuxUtRFkRZJhjKTg9w8sesBKlM3hgcbZxE2nzSRbbAhRA?e=XNAH9v?download=1">model</a></td>
+</tr>
+</table>
+
+### RefCOCOpuls
+
+The following script run the finetuning on the `train` split of RefCOCOplus.
 ```bash
 bash scripts/train-rec-refcoco+.sh
 ```
 
-We also provide the checkpoints finetuned on downstream tasks for run evaluation directly.
-- [rec-refcocoplus-base](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ERCWoT4cpVNJr9OOXoNjdHQB6WelAAtAMj9rbE8DAoec0w?e=EhjHzT?download=1)
 
-Script to test for ROSITA base model on RefCOCOplus.
+As the training stage complete, you may run the following script to run evaluation on the `val/testA/testB` split of RefCOCOplus. 
 ```bash
 bash scripts/test-rec-refcoco+.sh
 ```
+We also provide the checkpoint model to reproduce the following results on `val` and `testA/B` split using the testing script above.
 
-Script to finetune for ROSITA base model on RefCOCOg.
+<table><tbody>
+<!-- TABLE HEADER -->
+
+<th align="center" rowspan="2">Name</th>
+<th align="center" colspan="3">RefCOCOplus</th>
+<th align="center" rowspan="2">Downloads</th>
+<!-- TABLE BODY -->
+<tr>
+<th align="center" valign="middle">val</th>
+<th align="center" valign="middle">testA</th>
+<th align="center" valign="middle">testB</th>
+</tr>
+<tr>
+<td align="center" nowrap>ROSITA-base</td>
+<td align="center" valign="middle">73.91</td>
+<td align="center" valign="middle">xx.xx</td>
+<td align="center" valign="middle">xx.xx</td>
+<td align="center" valign="middle"><a href="https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EVuxUtRFkRZJhjKTg9w8sesBKlM3hgcbZxE2nzSRbbAhRA?e=XNAH9v?download=1">model</a></td>
+</tr>
+</table>
+
+### RefCOCOg
+
+The following script run the finetuning on the `train` split of RefCOCOg.
 ```bash
 bash scripts/train-rec-refcocog.sh
 ```
 
-We also provide the checkpoints finetuned on downstream tasks for run evaluation directly.
-- [rec-refcocog-base](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EXxpfotSwO1Jgu5POVbLQ24BNUPHWfdCS07UyNJNHWP4vQ?e=VzcuhU?download=1)
 
-Script to test for ROSITA base model on RefCOCOg.
+As the training stage complete, you may run the following script to run evaluation on the `val/test` split of RefCOCOg. 
 ```bash
 bash scripts/test-rec-refcocog.sh
 ```
+We also provide the checkpoint model to reproduce the following results on `val` and `testA/B` split using the testing script above.
 
+<table><tbody>
+<!-- TABLE HEADER -->
+
+<th align="center" rowspan="2">Name</th>
+<th align="center" colspan="2">RefCOCOg</th>
+<th align="center" rowspan="2">Downloads</th>
+<!-- TABLE BODY -->
+<tr>
+<th align="center" valign="middle">val</th>
+<th align="center" valign="middle">test</th>
+</tr>
+<tr>
+<td align="center" nowrap>ROSITA-base</td>
+<td align="center" valign="middle">73.91</td>
+<td align="center" valign="middle">xx.xx</td>
+<td align="center" valign="middle"><a href="https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EVuxUtRFkRZJhjKTg9w8sesBKlM3hgcbZxE2nzSRbbAhRA?e=XNAH9v?download=1">model</a></td>
+</tr>
+</table>
 
 
 ## Image/Text Retrieval
 
-Script to finetune for ROSITA base model on ITR-COCO.
+### ITR-COCO
+
+The following script run the finetuning on the `train` split of ITR-COCO.
 ```bash
 bash scripts/train-itr-coco.sh
 ```
 
-We also provide the checkpoints finetuned on downstream tasks for run evaluation directly.
-- [itr-coco-base](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/Eet3nwx-RIVLt3v17tzsIhIBOnsTapsUVGR5HI2Hg_VKNQ?e=O2S19T?download=1)
-
-Script to test for ROSITA base model on ITR-COCO.
+As the training stage complete, you may run the following script to run evaluation on the `testall` split of ITR-COCO. 
 ```bash
 bash scripts/test-itr-coco.sh
 ```
+We also provide the checkpoint model to reproduce the following results on `testall` split using the testing script above.
 
-Script to finetune for ROSITA base model on ITR-Flickr.
+<table><tbody>
+<!-- TABLE HEADER -->
+
+<th align="center" rowspan="2">Name</th>
+<th align="center" colspan="3">IR-COCO</th>
+<th align="center" colspan="3">TR-COCO</th>
+<th align="center" rowspan="2">Downloads</th>
+<!-- TABLE BODY -->
+<tr>
+<th align="center" valign="middle">R@1</th>
+<th align="center" valign="middle">R@5</th>
+<th align="center" valign="middle">R@10</th>
+<th align="center" valign="middle">R@1</th>
+<th align="center" valign="middle">R@5</th>
+<th align="center" valign="middle">R@10</th>
+</tr>
+<tr>
+<td align="center" nowrap>ROSITA-base</td>
+<td align="center" valign="middle">73.91</td>
+<td align="center" valign="middle">xx.xx</td>
+<td align="center" valign="middle">xx.xx</td>
+<td align="center" valign="middle">73.91</td>
+<td align="center" valign="middle">xx.xx</td>
+<td align="center" valign="middle">xx.xx</td>
+<td align="center" valign="middle"><a href="https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EVuxUtRFkRZJhjKTg9w8sesBKlM3hgcbZxE2nzSRbbAhRA?e=XNAH9v?download=1">model</a></td>
+</tr>
+</table>
+
+### ITR-Flickr
+
+The following script run the finetuning on the `train` split of ITR-Flickr.
 ```bash
 bash scripts/train-itr-flickr.sh
 ```
 
-We also provide the checkpoints finetuned on downstream tasks for run evaluation directly.
-- [itr-flickr-base](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EYsabcbcrflOinC4LyuAfzYBaCucZZ6wv7e7k1QgTG32JA?e=jgYBOR?download=1)
-
-Script to test for ROSITA base model on ITR-Flickr.
+As the training stage complete, you may run the following script to run evaluation on the `test` split of ITR-Flickr.
 ```bash
 bash scripts/test-itr-flickr.sh
 ```
+We also provide the checkpoint model to reproduce the following results on `test` split using the testing script above.
+
+<table><tbody>
+<!-- TABLE HEADER -->
+
+<th align="center" rowspan="2">Name</th>
+<th align="center" colspan="3">IR-Flickr</th>
+<th align="center" colspan="3">TR-Flickr</th>
+<th align="center" rowspan="2">Downloads</th>
+<!-- TABLE BODY -->
+<tr>
+<th align="center" valign="middle">R@1</th>
+<th align="center" valign="middle">R@5</th>
+<th align="center" valign="middle">R@10</th>
+<th align="center" valign="middle">R@1</th>
+<th align="center" valign="middle">R@5</th>
+<th align="center" valign="middle">R@10</th>
+</tr>
+<tr>
+<td align="center" nowrap>ROSITA-base</td>
+<td align="center" valign="middle">73.91</td>
+<td align="center" valign="middle">xx.xx</td>
+<td align="center" valign="middle">xx.xx</td>
+<td align="center" valign="middle">73.91</td>
+<td align="center" valign="middle">xx.xx</td>
+<td align="center" valign="middle">xx.xx</td>
+<td align="center" valign="middle"><a href="https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EVuxUtRFkRZJhjKTg9w8sesBKlM3hgcbZxE2nzSRbbAhRA?e=XNAH9v?download=1">model</a></td>
+</tr>
+</table>
