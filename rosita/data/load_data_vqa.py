@@ -1,3 +1,9 @@
+# -------------------------------------------------------- 
+ # ROSITA
+ # Licensed under The Apache License 2.0 [see LICENSE for details] 
+ # Written by Yuhao Cui and Tong-An Luo
+ # -------------------------------------------------------- 
+
 import numpy as np
 import json, re, torch, logging, collections, copy, math, os, base64
 import torch.utils.data as Data

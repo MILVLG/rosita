@@ -112,14 +112,14 @@ class DataSet(Data.Dataset):
 
         # Padding and process bbox relation
         imgfeat_bbox = self.proc_bbox(boxes, (image_h, image_w))
-        imgfeat_relation = self.relation_embedding(torch.from_numpy(boxes.astype(np.float32)))  # [n_obj, n_obj, 4]
-        imgfeat_input, imgfeat_mask, imgfeat_bbox, imgfeat_relation = self.proc_imgfeat(imgfeat_input, imgfeat_bbox, imgfeat_relation)
+        # imgfeat_relation = self.relation_embedding(torch.from_numpy(boxes.astype(np.float32)))  # [n_obj, n_obj, 4]
+        imgfeat_input, imgfeat_mask, imgfeat_bbox = self.proc_imgfeat(imgfeat_input, imgfeat_bbox)
 
         imgfeat_input = torch.from_numpy(imgfeat_input)
         imgfeat_mask = torch.from_numpy(imgfeat_mask)
         imgfeat_bbox = torch.from_numpy(imgfeat_bbox)
 
-        return imgfeat_input, imgfeat_mask, imgfeat_bbox, imgfeat_relation
+        return imgfeat_input, imgfeat_mask, imgfeat_bbox
 
     def load_formatted_data(self, idx):
         if self.text_segment is not None:
@@ -133,14 +133,23 @@ class DataSet(Data.Dataset):
         pos_text_idx = torch.tensor(idx).long()
         pos_img_idx = torch.tensor(self.idx_to_feat_idx[str(idx)]).long()
         neg_text_idx = self.neg_text_hard_ids[self.idx_to_feat_idx[str(idx)], random.randint(0, self.__C.NEG_HARDSIZE - 1)].item()
-        neg_img_idx = self.neg_img_hard_ids[idx, random.randint(0, self.__C.NEG_HARDSIZE - 1)].item()
-        neg_img_idx = self.idx_to_feat_idx[str(neg_img_idx)]
+        neg_img_idx_idx = self.neg_img_hard_ids[idx, random.randint(0, self.__C.NEG_HARDSIZE - 1)].item()
+        neg_img_idx = self.idx_to_feat_idx[str(neg_img_idx_idx)]
         assert self.idx_to_feat_idx[str(neg_text_idx)] != self.idx_to_feat_idx[str(pos_text_idx.item())]
         assert neg_img_idx != pos_img_idx.item()
         neg_text_idx = torch.tensor(neg_text_idx).long()
         neg_img_idx = torch.tensor(neg_img_idx).long()
 
-        return pos_text_idx, pos_img_idx, neg_text_idx, neg_img_idx
+        if self.__C.IMGFEAT_FORMAT == 'tsv':
+            formatted_data = self.load_formatted_data(idx)
+            imgfeat_input, imgfeat_mask, imgfeat_bbox = self.__getitem__img(formatted_data)
+            neg_formatted_data = self.load_formatted_data(neg_img_idx_idx)
+            neg_imgfeat_input, neg_imgfeat_mask, neg_imgfeat_bbox = self.__getitem__img(neg_formatted_data)
+
+            return pos_text_idx, imgfeat_input, imgfeat_mask, imgfeat_bbox,\
+                    neg_text_idx, neg_imgfeat_input, neg_imgfeat_mask, neg_imgfeat_bbox
+        else:
+            return pos_text_idx, pos_img_idx, neg_text_idx, neg_img_idx
 
 
     def __len__(self):
@@ -153,7 +162,6 @@ class DataSet(Data.Dataset):
         imgfeat_input_all = []
         imgfeat_mask_all = []
         imgfeat_bbox_all = []
-        imgfeat_relation_all = []
         imgfeat_load_set = set()
         for idx in range(self.data_size):
             proc_rank = self.__C.GRANK if self.__C.MP_STORAGE_SHR['screen'] else self.__C.LRANK
@@ -163,24 +171,25 @@ class DataSet(Data.Dataset):
             text_input_ids, text_mask = self.__getitem__text(formatted_data)
             text_input_ids_all.append(text_input_ids.unsqueeze(0))
             text_mask_all.append(text_mask.unsqueeze(0))
+            if self.__C.IMGFEAT_FORMAT == 'tsv':
+                continue
             if formatted_data['img_file'] not in imgfeat_load_set:
                 assert formatted_data['img_file'] == self.ids_to_feat[str(len(imgfeat_load_set))]
                 imgfeat_load_set.add(formatted_data['img_file'])
-                imgfeat_input, imgfeat_mask, imgfeat_bbox, imgfeat_relation = self.__getitem__img(formatted_data)
+                imgfeat_input, imgfeat_mask, imgfeat_bbox = self.__getitem__img(formatted_data)
                 imgfeat_input_all.append(imgfeat_input.unsqueeze(0))
                 imgfeat_mask_all.append(imgfeat_mask.unsqueeze(0))
                 imgfeat_bbox_all.append(imgfeat_bbox.unsqueeze(0))
-                imgfeat_relation_all.append(imgfeat_relation.unsqueeze(0))
             assert self.idx_to_feat_idx[str(idx)] == len(imgfeat_load_set) - 1
         text_input_ids_all = torch.cat(text_input_ids_all, dim=0)
         text_mask_all = torch.cat(text_mask_all, dim=0)
-        imgfeat_input_all = torch.cat(imgfeat_input_all, dim=0)
-        imgfeat_mask_all = torch.cat(imgfeat_mask_all, dim=0)
-        imgfeat_bbox_all = torch.cat(imgfeat_bbox_all, dim=0)
-        imgfeat_relation_all = torch.cat(imgfeat_relation_all, dim=0)
-        assert imgfeat_input_all.size(0) * 5 == text_input_ids_all.size(0)
+        if self.__C.IMGFEAT_FORMAT == 'npz':
+            imgfeat_input_all = torch.cat(imgfeat_input_all, dim=0)
+            imgfeat_mask_all = torch.cat(imgfeat_mask_all, dim=0)
+            imgfeat_bbox_all = torch.cat(imgfeat_bbox_all, dim=0)
+            assert imgfeat_input_all.size(0) * 5 == text_input_ids_all.size(0)
 
-        return text_input_ids_all, text_mask_all, imgfeat_input_all, imgfeat_mask_all, imgfeat_bbox_all, imgfeat_relation_all
+        return text_input_ids_all, text_mask_all, imgfeat_input_all, imgfeat_mask_all, imgfeat_bbox_all
 
 
     def clean_text(self, text):
@@ -224,8 +233,8 @@ class DataSet(Data.Dataset):
     
 
     def load_tsv(self, img_src):
-        tsv_file = self.__C.IMGFEAT_ROOTPATH_MAP[img_src] + '.tsv'
-        img_feat_offset_map_file = tsv_file.replace(tsv_file.split('/')[-1], 'img_feat_offset_map.json')
+        tsv_file = self.__C.IMGFEAT_ROOTPATH_MAP[img_src] + '_tsv/imgfeat.tsv'
+        img_feat_offset_map_file = self.__C.IMGFEAT_ROOTPATH_MAP[img_src] + '_tsv/img_feat_offset_map.json'
         with open(img_feat_offset_map_file) as f:
             img_feat_offset_map = json.load(f)
         return TSVFile(tsv_file), img_feat_offset_map
@@ -257,7 +266,7 @@ class DataSet(Data.Dataset):
         return np.pad(tensor, ((0, length - tensor.shape[0]), (0, 0)), mode='constant', constant_values=value)
 
 
-    def proc_imgfeat(self, imgfeat_input, imgfeat_bbox, imgfeat_relation):
+    def proc_imgfeat(self, imgfeat_input, imgfeat_bbox):
         length_pad = self.__C.PAD_MAX['image']
 
         imgfeat_mask = torch.ones(imgfeat_input.shape[0], dtype=torch.float32)
@@ -265,10 +274,10 @@ class DataSet(Data.Dataset):
         imgfeat_input = self.np_pad_2d(imgfeat_input, length_pad)
         imgfeat_bbox = self.np_pad_2d(imgfeat_bbox, length_pad)
 
-        imgfeat_relation_padded = torch.zeros(length_pad, length_pad, 4)
-        imgfeat_relation_padded[:imgfeat_relation.size(0), :imgfeat_relation.size(1), :] = imgfeat_relation[:]
+        # imgfeat_relation_padded = torch.zeros(length_pad, length_pad, 4)
+        # imgfeat_relation_padded[:imgfeat_relation.size(0), :imgfeat_relation.size(1), :] = imgfeat_relation[:]
 
-        return imgfeat_input, imgfeat_mask, imgfeat_bbox, imgfeat_relation_padded
+        return imgfeat_input, imgfeat_mask, imgfeat_bbox
 
 
     def proc_bbox(self, bbox, img_shape):
@@ -284,33 +293,33 @@ class DataSet(Data.Dataset):
         return bbox_feat
 
 
-    def relation_embedding(self, f_g):
-        x_min, y_min, x_max, y_max = torch.chunk(f_g, 4, dim=1)  # [n_obj, 1]
+    # def relation_embedding(self, f_g):
+    #     x_min, y_min, x_max, y_max = torch.chunk(f_g, 4, dim=1)  # [n_obj, 1]
 
-        cx = (x_min + x_max) * 0.5  # [n_obj, 1]
-        cy = (y_min + y_max) * 0.5  # [n_obj, 1]
-        w = (x_max - x_min) + 1.  # [n_obj, 1]
-        h = (y_max - y_min) + 1.  # [n_obj, 1]
+    #     cx = (x_min + x_max) * 0.5  # [n_obj, 1]
+    #     cy = (y_min + y_max) * 0.5  # [n_obj, 1]
+    #     w = (x_max - x_min) + 1.  # [n_obj, 1]
+    #     h = (y_max - y_min) + 1.  # [n_obj, 1]
 
-        delta_x = cx - cx.view(1, -1)
-        delta_x = torch.clamp(torch.abs(delta_x / w), min=1e-3)
-        delta_x = torch.log(delta_x)  # [n_obj, n_obj]
+    #     delta_x = cx - cx.view(1, -1)
+    #     delta_x = torch.clamp(torch.abs(delta_x / w), min=1e-3)
+    #     delta_x = torch.log(delta_x)  # [n_obj, n_obj]
 
-        delta_y = cy - cy.view(1, -1)
-        delta_y = torch.clamp(torch.abs(delta_y / h), min=1e-3)
-        delta_y = torch.log(delta_y)  # [n_obj, n_obj]
+    #     delta_y = cy - cy.view(1, -1)
+    #     delta_y = torch.clamp(torch.abs(delta_y / h), min=1e-3)
+    #     delta_y = torch.log(delta_y)  # [n_obj, n_obj]
 
-        delta_w = torch.log(w / w.view(1, -1))  # [n_obj, n_obj]
-        delta_h = torch.log(h / h.view(1, -1))  # [n_obj, n_obj]
-        size = delta_h.size()
+    #     delta_w = torch.log(w / w.view(1, -1))  # [n_obj, n_obj]
+    #     delta_h = torch.log(h / h.view(1, -1))  # [n_obj, n_obj]
+    #     size = delta_h.size()
 
-        delta_x = delta_x.view(size[0], size[1], 1)
-        delta_y = delta_y.view(size[0], size[1], 1)
-        delta_w = delta_w.view(size[0], size[1], 1)
-        delta_h = delta_h.view(size[0], size[1], 1)  # [n_obj, n_obj, 1]
-        position_mat = torch.cat((delta_x, delta_y, delta_w, delta_h), -1)  # [n_obj, n_obj, 4]
+    #     delta_x = delta_x.view(size[0], size[1], 1)
+    #     delta_y = delta_y.view(size[0], size[1], 1)
+    #     delta_w = delta_w.view(size[0], size[1], 1)
+    #     delta_h = delta_h.view(size[0], size[1], 1)  # [n_obj, n_obj, 1]
+    #     position_mat = torch.cat((delta_x, delta_y, delta_w, delta_h), -1)  # [n_obj, n_obj, 4]
 
-        return position_mat
+    #     return position_mat
 
 
 
@@ -415,15 +424,14 @@ class DataSet_Neg(Data.Dataset):
 
         # Padding and process bbox relation
         imgfeat_bbox = self.proc_bbox(boxes, (image_h, image_w))
-        imgfeat_relation = self.relation_embedding(torch.from_numpy(boxes.astype(np.float32)))  # [n_obj, n_obj, 4]
-        imgfeat_input, imgfeat_mask, imgfeat_bbox, imgfeat_relation = self.proc_imgfeat(imgfeat_input, imgfeat_bbox,
-                                                                                        imgfeat_relation)
+        # imgfeat_relation = self.relation_embedding(torch.from_numpy(boxes.astype(np.float32)))  # [n_obj, n_obj, 4]
+        imgfeat_input, imgfeat_mask, imgfeat_bbox = self.proc_imgfeat(imgfeat_input, imgfeat_bbox)
 
         imgfeat_input = torch.from_numpy(imgfeat_input)
         imgfeat_mask = torch.from_numpy(imgfeat_mask)
         imgfeat_bbox = torch.from_numpy(imgfeat_bbox)
 
-        return imgfeat_input, imgfeat_mask, imgfeat_bbox, imgfeat_relation
+        return imgfeat_input, imgfeat_mask, imgfeat_bbox
 
     def load_formatted_data(self, idx):
         if self.text_segment is not None:
@@ -458,7 +466,21 @@ class DataSet_Neg(Data.Dataset):
                 text_idx[step] = rid
                 neg_idx[step] = rid
 
-        return text_idx, img_idx, neg_idx
+        if self.use_tsv:
+            imgfeat_input_all, imgfeat_mask_all, imgfeat_bbox_all = [], [], []
+            for i in range(img_idx.size(0)):
+                sample_idx = self.feat_idx_to_idx[str(int(img_idx[i]))]
+                formatted_data = self.load_formatted_data(sample_idx)
+                imgfeat_input, imgfeat_mask, imgfeat_bbox = self.__getitem__img(formatted_data)
+                imgfeat_input_all.append(imgfeat_input.unsqueeze(0))
+                imgfeat_mask_all.append(imgfeat_mask.unsqueeze(0))
+                imgfeat_bbox_all.append(imgfeat_bbox.unsqueeze(0))
+            imgfeat_input_all = torch.cat(imgfeat_input_all, dim=0)
+            imgfeat_mask_all = torch.cat(imgfeat_mask_all, dim=0)
+            imgfeat_bbox_all = torch.cat(imgfeat_bbox_all, dim=0)
+            return text_idx, imgfeat_input_all, imgfeat_mask_all, imgfeat_bbox_all, neg_idx
+        else:
+            return text_idx, img_idx, neg_idx
 
 
     def __len__(self):
@@ -506,8 +528,8 @@ class DataSet_Neg(Data.Dataset):
     
 
     def load_tsv(self, img_src):
-        tsv_file = self.__C.IMGFEAT_ROOTPATH_MAP[img_src] + '.tsv'
-        img_feat_offset_map_file = tsv_file.replace(tsv_file.split('/')[-1], 'img_feat_offset_map.json')
+        tsv_file = self.__C.IMGFEAT_ROOTPATH_MAP[img_src] + '_tsv/imgfeat.tsv'
+        img_feat_offset_map_file = self.__C.IMGFEAT_ROOTPATH_MAP[img_src] + '_tsv/img_feat_offset_map.json'
         with open(img_feat_offset_map_file) as f:
             img_feat_offset_map = json.load(f)
         return TSVFile(tsv_file), img_feat_offset_map
@@ -535,7 +557,7 @@ class DataSet_Neg(Data.Dataset):
             tensor = tensor[:length]
         return np.pad(tensor, ((0, length - tensor.shape[0]), (0, 0)), mode='constant', constant_values=value)
 
-    def proc_imgfeat(self, imgfeat_input, imgfeat_bbox, imgfeat_relation):
+    def proc_imgfeat(self, imgfeat_input, imgfeat_bbox):
         length_pad = self.__C.PAD_MAX['image']
 
         imgfeat_mask = torch.ones(imgfeat_input.shape[0], dtype=torch.float32)
@@ -543,10 +565,10 @@ class DataSet_Neg(Data.Dataset):
         imgfeat_input = self.np_pad_2d(imgfeat_input, length_pad)
         imgfeat_bbox = self.np_pad_2d(imgfeat_bbox, length_pad)
 
-        imgfeat_relation_padded = torch.zeros(length_pad, length_pad, 4)
-        imgfeat_relation_padded[:imgfeat_relation.size(0), :imgfeat_relation.size(1), :] = imgfeat_relation[:]
+        # imgfeat_relation_padded = torch.zeros(length_pad, length_pad, 4)
+        # imgfeat_relation_padded[:imgfeat_relation.size(0), :imgfeat_relation.size(1), :] = imgfeat_relation[:]
 
-        return imgfeat_input, imgfeat_mask, imgfeat_bbox, imgfeat_relation_padded
+        return imgfeat_input, imgfeat_mask, imgfeat_bbox
 
     def proc_bbox(self, bbox, img_shape):
         bbox = copy.deepcopy(bbox)
@@ -560,30 +582,30 @@ class DataSet_Neg(Data.Dataset):
 
         return bbox_feat
 
-    def relation_embedding(self, f_g):
-        x_min, y_min, x_max, y_max = torch.chunk(f_g, 4, dim=1)  # [n_obj, 1]
+    # def relation_embedding(self, f_g):
+    #     x_min, y_min, x_max, y_max = torch.chunk(f_g, 4, dim=1)  # [n_obj, 1]
 
-        cx = (x_min + x_max) * 0.5  # [n_obj, 1]
-        cy = (y_min + y_max) * 0.5  # [n_obj, 1]
-        w = (x_max - x_min) + 1.  # [n_obj, 1]
-        h = (y_max - y_min) + 1.  # [n_obj, 1]
+    #     cx = (x_min + x_max) * 0.5  # [n_obj, 1]
+    #     cy = (y_min + y_max) * 0.5  # [n_obj, 1]
+    #     w = (x_max - x_min) + 1.  # [n_obj, 1]
+    #     h = (y_max - y_min) + 1.  # [n_obj, 1]
 
-        delta_x = cx - cx.view(1, -1)
-        delta_x = torch.clamp(torch.abs(delta_x / w), min=1e-3)
-        delta_x = torch.log(delta_x)  # [n_obj, n_obj]
+    #     delta_x = cx - cx.view(1, -1)
+    #     delta_x = torch.clamp(torch.abs(delta_x / w), min=1e-3)
+    #     delta_x = torch.log(delta_x)  # [n_obj, n_obj]
 
-        delta_y = cy - cy.view(1, -1)
-        delta_y = torch.clamp(torch.abs(delta_y / h), min=1e-3)
-        delta_y = torch.log(delta_y)  # [n_obj, n_obj]
+    #     delta_y = cy - cy.view(1, -1)
+    #     delta_y = torch.clamp(torch.abs(delta_y / h), min=1e-3)
+    #     delta_y = torch.log(delta_y)  # [n_obj, n_obj]
 
-        delta_w = torch.log(w / w.view(1, -1))  # [n_obj, n_obj]
-        delta_h = torch.log(h / h.view(1, -1))  # [n_obj, n_obj]
-        size = delta_h.size()
+    #     delta_w = torch.log(w / w.view(1, -1))  # [n_obj, n_obj]
+    #     delta_h = torch.log(h / h.view(1, -1))  # [n_obj, n_obj]
+    #     size = delta_h.size()
 
-        delta_x = delta_x.view(size[0], size[1], 1)
-        delta_y = delta_y.view(size[0], size[1], 1)
-        delta_w = delta_w.view(size[0], size[1], 1)
-        delta_h = delta_h.view(size[0], size[1], 1)  # [n_obj, n_obj, 1]
-        position_mat = torch.cat((delta_x, delta_y, delta_w, delta_h), -1)  # [n_obj, n_obj, 4]
+    #     delta_x = delta_x.view(size[0], size[1], 1)
+    #     delta_y = delta_y.view(size[0], size[1], 1)
+    #     delta_w = delta_w.view(size[0], size[1], 1)
+    #     delta_h = delta_h.view(size[0], size[1], 1)  # [n_obj, n_obj, 1]
+    #     position_mat = torch.cat((delta_x, delta_y, delta_w, delta_h), -1)  # [n_obj, n_obj, 4]
 
-        return position_mat
+    #     return position_mat

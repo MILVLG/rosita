@@ -28,6 +28,7 @@ DATASET_LIST:
     - coco:testall
 
 # Features
+IMGFEAT_FORMAT: tsv
 IMGFEAT_LIST:
   - coco:butd_res101_36-36_i32w_pyt
 
@@ -55,3 +56,6 @@ NET_GRAD_CLIP: 1.
 NET_LR_DECAY_R: 0.1
 NET_LR_DECAY_LIST: [2, 4]
 WARMUP_EPOCHS: 1
+
+TEXT_SEGMENT_PATH: /data-ssd/luota/tmp/segment/
+SEGMENT_TEXT: True

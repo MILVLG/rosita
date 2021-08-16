@@ -1,3 +1,9 @@
+# -------------------------------------------------------- 
+ # ROSITA
+ # Licensed under The Apache License 2.0 [see LICENSE for details] 
+ # Written by Yuhao Cui
+ # -------------------------------------------------------- 
+ 
 import logging, json, os
 import numpy as np
 import torch.distributed as dist

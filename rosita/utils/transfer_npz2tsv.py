@@ -1,4 +1,9 @@
-# Copyright (c) 2021 Microsoft Corporation. Licensed under the MIT license. 
+# -------------------------------------------------------- 
+ # ROSITA
+ # Licensed under The Apache License 2.0 [see LICENSE for details] 
+ # Written by Tong-An Luo
+ # -------------------------------------------------------- 
+ 
 import os
 import os.path as op
 import json
@@ -10,8 +15,8 @@ from tsv_file import tsv_writer
 
 # To transfer npz files to a tsv file:
 npz_path = "../../datasets/mscoco/features/butd_res101_36-36_i32w_pyt"
-tsv_file = "../../datasets/mscoco/features/butd_res101_36-36_i32w_pyt.tsv"
-img_feat_offset_map_file = "../../datasets/mscoco/features/img_feat_offset_map.json"
+tsv_file = "../../datasets/mscoco/features/butd_res101_36-36_i32w_pyt_tsv/imgfeat.tsv"
+img_feat_offset_map_file = "../../datasets/mscoco/features/butd_res101_36-36_i32w_pyt_tsv/img_feat_offset_map.json"
 
 npz_list = os.listdir(npz_path)
 

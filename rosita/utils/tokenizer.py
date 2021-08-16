@@ -1,7 +1,5 @@
 import collections
 import unicodedata
-import os
-import logging
 
 
 def whitespace_tokenize(text):

@@ -1,4 +1,4 @@
-import math, os, json, torch, datetime, random, copy, shutil, logging, socket
+import math, torch
 import torch.utils.data as Data
 import torch.distributed as dist
 
@@ -22,7 +22,6 @@ class SubsetDistributedSampler(Data.Sampler):
         else:
             self.subset_indices = list(range(len(self.dataset)))
         self.epoch = 0
-        # self.num_samples = int(math.ceil(len(self.dataset) * 1.0 / self.num_replicas))
         self.num_samples = int(math.ceil(len(self.subset_indices) * 1.0 / self.num_replicas))
         self.total_size = self.num_samples * self.num_replicas
         self.rest_data_num = self.total_size - len(self.subset_indices)
@@ -37,7 +36,6 @@ class SubsetDistributedSampler(Data.Sampler):
             indices = list(range(len(self.subset_indices)))
 
         # add extra samples to make it evenly divisible
-        # indices += indices[:(self.total_size - len(indices))]
         indices += indices[:self.rest_data_num]
         assert len(indices) == self.total_size
 

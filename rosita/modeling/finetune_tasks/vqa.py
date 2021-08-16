@@ -1,3 +1,9 @@
+# -------------------------------------------------------- 
+ # ROSITA
+ # Licensed under The Apache License 2.0 [see LICENSE for details] 
+ # Written by Yuhao Cui and Tong-An Luo
+ # -------------------------------------------------------- 
+
 import torch
 import torch.nn as nn
 from modeling.transformer import TextEmbeddings, VisualEmbeddings, Backbone, Pooler, gelu, LayerNorm

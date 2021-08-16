@@ -31,6 +31,7 @@ DATASET_LIST:
     - flickr:test
 
 # Features
+IMGFEAT_FORMAT: tsv
 IMGFEAT_LIST:
   - flickr:butd_res101_36-36_i32w_pyt
 

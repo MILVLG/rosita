@@ -1,3 +1,9 @@
+# -------------------------------------------------------- 
+ # ROSITA
+ # Licensed under The Apache License 2.0 [see LICENSE for details] 
+ # Written by Yuhao Cui and Tong-An Luo
+ # -------------------------------------------------------- 
+
 import torch, logging, os
 import torch.nn as nn
 from .path_cfg import Path

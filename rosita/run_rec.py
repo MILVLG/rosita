@@ -1,3 +1,9 @@
+# -------------------------------------------------------- 
+ # ROSITA
+ # Licensed under The Apache License 2.0 [see LICENSE for details] 
+ # Written by Yuhao Cui and Tong-An Luo
+ # -------------------------------------------------------- 
+ 
 import torch, datetime, logging, random, copy
 import torch.nn as nn
 import torch.optim as Optim
