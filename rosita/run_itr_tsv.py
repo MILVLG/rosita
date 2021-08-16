@@ -254,14 +254,14 @@ class Execution:
 
                     text_input_ids = text_input_ids_all[pos_text_idx, :]
                     text_mask = text_mask_all[pos_text_idx, :]
-                    imgfeat_input = imgfeat_input.view(-1, imgfeat_input.size(2), imgfeat_input.size(3))
-                    imgfeat_mask = imgfeat_mask.view(-1, imgfeat_mask.size(2))
-                    imgfeat_bbox = imgfeat_bbox.view(-1, imgfeat_bbox.size(2), imgfeat_bbox.size(3))
+                    # imgfeat_input = imgfeat_input.view(-1, imgfeat_input.size(2), imgfeat_input.size(3))
+                    # imgfeat_mask = imgfeat_mask.view(-1, imgfeat_mask.size(2))
+                    # imgfeat_bbox = imgfeat_bbox.view(-1, imgfeat_bbox.size(2), imgfeat_bbox.size(3))
                     neg_text_input_ids = text_input_ids_all[neg_text_idx, :]
                     neg_text_mask = text_mask_all[neg_text_idx, :]
-                    neg_imgfeat_input = neg_imgfeat_input.view(-1, neg_imgfeat_input.size(2), neg_imgfeat_input.size(3))
-                    neg_imgfeat_mask = neg_imgfeat_mask.view(-1, neg_imgfeat_mask.size(2))
-                    neg_imgfeat_bbox = neg_imgfeat_bbox.view(-1, neg_imgfeat_bbox.size(2), neg_imgfeat_bbox.size(3))
+                    # neg_imgfeat_input = neg_imgfeat_input.view(-1, neg_imgfeat_input.size(2), neg_imgfeat_input.size(3))
+                    # neg_imgfeat_mask = neg_imgfeat_mask.view(-1, neg_imgfeat_mask.size(2))
+                    # neg_imgfeat_bbox = neg_imgfeat_bbox.view(-1, neg_imgfeat_bbox.size(2), neg_imgfeat_bbox.size(3))
 
                 text_input_ids = text_input_ids.to(self.cfg.DEVICE_IDS[0])
                 text_mask = text_mask.to(self.cfg.DEVICE_IDS[0])
