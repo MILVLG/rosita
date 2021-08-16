@@ -68,7 +68,7 @@ We compare ROSITA against existing state-of-the-art VLP methods on three downstr
 
 #### Software and Hardware Requirements
 
-You may need a machine with at least **4 GPU (>= 12GB)**, **20GB memory** and **50GB free disk space**. We strongly recommend to use a SSD drive to guarantee high-speed I/O. Also, you should first install some necessary package as follows:
+You may need a machine with at least **4 GPU (>= 25GB)**, **120GB memory** and **50GB free disk space**. We strongly recommend to use a SSD drive to guarantee high-speed I/O. Also, you should first install some necessary package as follows:
 
 - Python >= 3.6
 - PyTorch >= 1.4 with Cuda >=10.2
