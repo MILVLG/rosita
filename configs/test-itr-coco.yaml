@@ -1,0 +1,45 @@
+VERSION: test-itr-coco-1
+RUN_MODE: test
+DATASET_ROOTPATH: datasets
+OUTPATH: outputs
+
+# Workers and batch size
+NUM_WORKERS: 4
+NUM_WORKERS_NEG: 4
+BATCH_SIZE: 64
+EVAL_BATCH_SIZE: 600
+
+# Load ckpt
+CKPT_FILE: ckpts/itr-coco-base.pkl
+
+CKPT_SAVE_MAP:
+  mm_itm_head: mm_itm_head
+
+# Datasets
+DATASET_LIST:
+  train:
+    - coco:train
+  val:
+    - coco:test
+  test:
+    - coco:testall
+
+# Features
+IMGFEAT_LIST:
+  - coco:butd_res101_36-36_i32w_pyt
+
+# ITR Params
+NEG_BATCHSIZE: 25
+NEG_RANDSIZE: 128
+NEG_HARDSIZE: 5
+NEG_NEPOCH: 1
+NEG_START_EPOCH: 0
+
+# Model Params
+PAD_MAX:
+  text: 30
+  image: 36
+
+TASKS:
+  mm:
+    - itm-tri

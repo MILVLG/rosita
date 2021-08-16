@@ -1,0 +1,61 @@
+VERSION: train-itr-coco-1
+RUN_MODE: train
+DATASET_ROOTPATH: datasets
+OUTPATH: outputs
+
+# Workers and batch size
+NUM_WORKERS: 4
+NUM_WORKERS_NEG: 4
+BATCH_SIZE: 64
+EVAL_BATCH_SIZE: 600
+
+# Load ckpt
+CKPT_FILE: ckpts/rosita-base.pkl
+
+CKPT_LOAD_MAP:
+  mm_itm_head: mm_itm_head
+
+CKPT_SAVE_MAP:
+  mm_itm_head: mm_itm_head
+
+# Datasets
+DATASET_LIST:
+  train:
+    - coco:train
+  val:
+    - coco:test
+  test:
+    - coco:testall
+
+# Features
+IMGFEAT_FORMAT: tsv
+IMGFEAT_LIST:
+  - coco:butd_res101_36-36_i32w_pyt
+
+# ITR Params
+NEG_BATCHSIZE: 25
+NEG_RANDSIZE: 128
+NEG_HARDSIZE: 5
+NEG_NEPOCH: 1
+NEG_START_EPOCH: 0
+
+# Model Params
+PAD_MAX:
+  text: 30
+  image: 36
+
+TASKS:
+  mm:
+    - itm-tri
+
+# Optimizer Params
+NET_OPTIM: warmup_adam
+NET_LR_BASE: 0.00004
+NET_WEIGHT_DECAY: 0
+NET_GRAD_CLIP: 1.
+NET_LR_DECAY_R: 0.1
+NET_LR_DECAY_LIST: [2, 4]
+WARMUP_EPOCHS: 1
+
+TEXT_SEGMENT_PATH: /data-ssd/luota/tmp/segment/
+SEGMENT_TEXT: False
