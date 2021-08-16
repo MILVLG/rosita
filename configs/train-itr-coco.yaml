@@ -58,4 +58,4 @@ NET_LR_DECAY_LIST: [2, 4]
 WARMUP_EPOCHS: 1
 
 TEXT_SEGMENT_PATH: /data-ssd/luota/tmp/segment/
-SEGMENT_TEXT: True
+SEGMENT_TEXT: False
