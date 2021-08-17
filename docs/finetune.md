@@ -99,15 +99,15 @@ We also provide the checkpoint model to reproduce the following results on `val`
 </tr>
 </table>
 
-### RefCOCOpuls
+### RefCOCO+
 
-The following script run the finetuning on the `train` split of RefCOCOplus.
+The following script run the finetuning on the `train` split of RefCOCO+.
 ```bash
 bash scripts/train-rec-refcoco+.sh
 ```
 
 
-As the training stage complete, you may run the following script to run evaluation on the `val/testA/testB` split of RefCOCOplus. 
+As the training stage complete, you may run the following script to run evaluation on the `val/testA/testB` split of RefCOCO+. 
 ```bash
 bash scripts/test-rec-refcoco+.sh
 ```
@@ -117,7 +117,7 @@ We also provide the checkpoint model to reproduce the following results on `val`
 <!-- TABLE HEADER -->
 
 <th align="center" rowspan="2">Name</th>
-<th align="center" colspan="3">RefCOCOplus</th>
+<th align="center" colspan="3">RefCOCO+</th>
 <th align="center" rowspan="2">Downloads</th>
 <!-- TABLE BODY -->
 <tr>
