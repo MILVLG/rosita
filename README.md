@@ -5,7 +5,6 @@
 ## News & Update
 
 **(15/08/2021)**
-
 - Release the basic framework for ROSITA, including the pretrained base ROSITA model, as well as the scripts to run the fine-tuning and evaluation on three downstream tasks (i.e., VQA, REC, ITR) over six datasets.
 
 ## Introduction
@@ -101,6 +100,10 @@ Please check [pretrain.md](docs/pretrain.md) for the details for ROSITA pretrain
 ## Finetuning
 
 Please check [finetune.md](docs/finetune.md) for the details for finetuning on downstream tasks. Scripts to run finetuning on downstream tasks are provided. Also, we provide trained models that can be directly evaluated to reproduce the results.  
+
+## Acknowledgment
+
+We refer to some well-organized VLP implementations like [LXMERT](https://github.com/airsplay/lxmert), [UNITER](https://github.com/ChenRocks/UNITER), and [OSCAR](https://github.com/microsoft/Oscar) when writing the source codes. Yuhao Cui ([@cuiyuhao1996](https://github.com/cuiyuhao1996)) and Tong-An Luo ([@Zoroaster97](https://github.com/Zoroaster97)) are the main contributors to this repository. Please kindly contact them if you find any issue.
 
 
 ## Citations
