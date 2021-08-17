@@ -15,12 +15,12 @@ CKPT_SAVE_MAP:
 # Datasets
 DATASET_LIST:
   train:
-    - 'vqa:train'
-    - 'vqa:val'
+    - 'vqa-vqav2:train'
+    - 'vqa-vqav2:val'
   val:
-    - 'vqa:minival'
+    - 'vqa-vqav2:minival'
   test:
-    - 'vqa:test'
+    - 'vqa-vqav2:test'
 
 # Features
 IMGFEAT_LIST:

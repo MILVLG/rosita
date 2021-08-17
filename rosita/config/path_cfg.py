@@ -10,10 +10,9 @@ import logging
 class Path:
     def __init__(self):
         
-        self.IMGFEAT_ROOTPATH_MAP = {}
         self.IMGFEAT_TYPE_MAP = {}
-        self.DATASET_ROOTPATH = None
-        self.OUTPATH = None
+        self.DATASET_ROOTPATH = 'datasets'
+        self.OUTPATH = 'outputs'
 
         # Path must in multi-node shared storage
         self.TMP_RESULT_PATH = None
@@ -21,19 +20,26 @@ class Path:
         self.TEXT_SEGMENT_PATH = None
 
         self.DATASET_PATHMAP = {
-            'vqa': 'VQA',
-            'flickr': 'flickr',
-            'coco': 'mscoco',
-            'refcoco': 'RefCOCO',
-            'refcoco+': 'RefCOCO',
-            'refcocog': 'RefCOCO',
+            'vqa-vqav2': 'annotations/vqa-vqav2',
+            'itr-flickr': 'annotations/itr-flickr',
+            'itr-coco': 'annotations/itr-coco',
+            'rec-refcoco': 'annotations/rec-refcoco',
+            'rec-refcocoplus': 'annotations/rec-refcocoplus',
+            'rec-refcocog': 'annotations/rec-refcocog',
         }
+
+        self.DATASET_FEATMAP = {
+            'vqa-vqav2': 'coco',
+            'itr-flickr': 'flickr',
+            'itr-coco': 'coco',
+            'rec-refcoco': 'coco',
+            'rec-refcocoplus': 'coco',
+            'rec-refcocog': 'coco',
+        }
+
         self.IMGFEAT_PATHMAP = {
-            'coco': 'mscoco',
-            'flickr': 'flickr',
-        }
-        self.IMGFEAT_TYPEMAP = {
-            'butd_res101_36-36_i32w_pyt': 'butd_res101_36-36_i32w_pyt',
+            'flickr': 'imgfeats/flickr_bua_r101_fix36',
+            'coco': 'imgfeats/mscoco_bua_r101_fix36',
         }
     
 
@@ -45,24 +51,18 @@ class Path:
         logging.info('OUTPATH: {}'.format(self.OUTPATH))
 
         dataset_rootpath = self.DATASET_ROOTPATH
-        postfix = '_tsg'
-        self.DATASET_ROOTPATH_MAP = {
-            'vqa': os.path.join(dataset_rootpath, (self.DATASET_PATHMAP['vqa'] + '/formatted_data{}.json'.format(postfix))),
-            'flickr': os.path.join(dataset_rootpath, (self.DATASET_PATHMAP['flickr'] + '/formatted_data{}.json'.format(postfix))),
-            'flickr_feat_neg_ids': os.path.join(dataset_rootpath, (self.DATASET_PATHMAP['flickr'] + '/feat_neg_ids_map.json')),
-            'coco': os.path.join(dataset_rootpath, (self.DATASET_PATHMAP['coco'] + '/formatted_data{}.json'.format(postfix))),
-            'coco_feat_neg_ids': os.path.join(dataset_rootpath, (self.DATASET_PATHMAP['coco'] + '/feat_neg_ids_map.json')),
-            'refcoco': os.path.join(dataset_rootpath, (self.DATASET_PATHMAP['refcoco'] + '/formatted_data_refcoco.json'.format(postfix))),
-            'refcoco+': os.path.join(dataset_rootpath, (self.DATASET_PATHMAP['refcoco+'] + '/formatted_data_refcoco+.json'.format(postfix))),
-            'refcocog': os.path.join(dataset_rootpath, (self.DATASET_PATHMAP['refcocog'] + '/formatted_data_refcocog.json'.format(postfix))),
-        }
-        self.DATASET_FEATMAP = {
-            'vqa': 'coco',
-            'flickr': 'flickr',
-            'coco': 'coco',
-            'refcoco': 'coco',
-            'refcoco+': 'coco',
-            'refcocog': 'coco',
+        for dataset_name in self.DATASET_PATHMAP:
+            self.DATASET_PATHMAP[dataset_name] = os.path.join(dataset_rootpath, self.DATASET_PATHMAP[dataset_name])
+        for featset_name in self.IMGFEAT_PATHMAP:
+            self.IMGFEAT_PATHMAP[featset_name] = os.path.join(dataset_rootpath, self.IMGFEAT_PATHMAP[featset_name])
+
+        self.DATASET_ANNO_MAP = {
+            'vqa-vqav2': os.path.join(self.DATASET_PATHMAP['vqa-vqav2'], 'vqa_vqav2_annotations.json'),
+            'itr-flickr': os.path.join(self.DATASET_PATHMAP['itr-flickr'], 'itr_flickr_annotations.json'),
+            'itr-coco': os.path.join(self.DATASET_PATHMAP['itr-coco'], 'itr_coco_annotations.json'),
+            'rec-refcoco': os.path.join(self.DATASET_PATHMAP['rec-refcoco'], 'rec_refcoco_annotations.json'),
+            'rec-refcocoplus': os.path.join(self.DATASET_PATHMAP['rec-refcocoplus'], 'rec_refcocoplus_annotations.json'),
+            'rec-refcocog': os.path.join(self.DATASET_PATHMAP['rec-refcocog'], 'rec_refcocog_annotations.json'),
         }
 
         self.LOG_PATH = os.path.join(self.OUTPATH, 'logs')
@@ -88,10 +88,7 @@ class Path:
             iset = imgfeat_name.split(':')[0]
             itype = imgfeat_name.split(':')[1]
             self.IMGFEAT_TYPE_MAP[iset] = itype
-
-            imgfeat_rootpath = os.path.join(self.DATASET_ROOTPATH, self.IMGFEAT_PATHMAP[iset], 'features', self.IMGFEAT_TYPEMAP[itype])
-
-            self.IMGFEAT_ROOTPATH_MAP[iset] = imgfeat_rootpath
+        pass
     
     def proc_qa_path(self):
         self.TEST_RESULT_PATH = os.path.join(self.OUTPATH, 'result_test')

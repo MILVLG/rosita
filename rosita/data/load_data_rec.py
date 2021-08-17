@@ -40,7 +40,7 @@ class DataSet(Data.Dataset):
             for dataset_name in self.__C.DATASET_LIST[RUN_MODE]:
                 tset = dataset_name.split(':')[0]
                 ttype = dataset_name.split(':')[1]
-                formatted_data = json.load(open(__C.DATASET_ROOTPATH_MAP[tset], 'r'))[ttype]
+                formatted_data = json.load(open(__C.DATASET_ANNO_MAP[tset], 'r'))[ttype]
                 self.data_aggr += formatted_data
                 logging.info('[dataset: {}] Loading [{}] data: {}'.format(RUN_MODE, dataset_name, len(formatted_data)))
             logging.info('[dataset: {}] Total Data: {}'.format(RUN_MODE, len(self.data_aggr)))
@@ -218,15 +218,15 @@ class DataSet(Data.Dataset):
 
     
     def load_npz(self, img_src, img_filename):
-        np_file = os.path.join(self.__C.IMGFEAT_ROOTPATH_MAP[img_src], (img_filename + '.npz'))
+        np_file = os.path.join(self.__C.IMGFEAT_PATHMAP[img_src], 'npz_files', (img_filename + '.npz'))
         npz_loaded = np.load(np_file)
 
         return npz_loaded
     
 
     def load_tsv(self, img_src):
-        tsv_file = self.__C.IMGFEAT_ROOTPATH_MAP[img_src] + '.tsv'
-        img_feat_offset_map_file = tsv_file.replace(tsv_file.split('/')[-1], 'img_feat_offset_map.json')
+        tsv_file = self.__C.IMGFEAT_PATHMAP[img_src] + '/imgfeat.tsv'
+        img_feat_offset_map_file = self.__C.IMGFEAT_PATHMAP[img_src] + '/img_feat_offset_map.json'
         with open(img_feat_offset_map_file) as f:
             img_feat_offset_map = json.load(f)
         return TSVFile(tsv_file), img_feat_offset_map

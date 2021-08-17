@@ -18,7 +18,7 @@ This repository contains source code necessary to reproduce the results presente
 
 ## Performance
 
-We compare ROSITA against existing state-of-the-art VLP methods on three downstream tasks. All methods use the base model of Transformer for a fair comparison. The trained checkpoints to reproduce these results are provided in [FINETUNE.md](FINETUNE.md). 
+We compare ROSITA against existing state-of-the-art VLP methods on three downstream tasks. All methods use the base model of Transformer for a fair comparison. The trained checkpoints to reproduce these results are provided in [finetune.md](docs/finetune.md). 
 
 <table><tbody>
 <!-- TABLE HEADER -->
@@ -92,15 +92,15 @@ $ cp build/lib*/bbox.cpython*.so .
 ## Dataset Setup
 
 
-To download the required datasets to run this project, please check [DATASET.md](DATASET.md) for details. 
+To download the required datasets to run this project, please check [datasets.md](docs/datasets.md) for details. 
 
 ## Pretraining
 
-Please check [PRETRAIN.md](PRETRAIN.md) for the details for ROSITA pretraining. **We currently only provide the pretrained model to run finetuning on downstream tasks. The codes to run pretraining will be released later**.  
+Please check [pretrain.md](docs/pretrain.md) for the details for ROSITA pretraining. **We currently only provide the pretrained model to run finetuning on downstream tasks. The codes to run pretraining will be released later**.  
 
 ## Finetuning
 
-Please check [FINETUNE.md](FINETUNE.md) for the details for finetuning on downstream tasks. Scripts to run finetuning on downstream tasks are provided. Also, we provide trained models that can be directly evaluated to reproduce the results.  
+Please check [finetune.md](docs/finetune.md) for the details for finetuning on downstream tasks. Scripts to run finetuning on downstream tasks are provided. Also, we provide trained models that can be directly evaluated to reproduce the results.  
 
 
 ## Citations

@@ -15,13 +15,13 @@ CKPT_SAVE_MAP:
 # Datasets
 DATASET_LIST:
   train:
-    - refcoco:train
+    - refitr-coco:train
   val:
-    - refcoco:val
+    - rec-refcoco:val
   test:
-    # - refcoco:val
-    # - refcoco:testA
-    - refcoco:testB
+    # - rec-refcoco:val
+    # - rec-refcoco:testA
+    - rec-refcoco:testB
 
 # Features
 IMGFEAT_LIST:

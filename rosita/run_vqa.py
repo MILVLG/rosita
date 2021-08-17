@@ -124,7 +124,7 @@ class Execution:
             proc_rank = self.cfg.GRANK if self.cfg.MP_STORAGE_SHR['ckpt'] else self.cfg.LRANK
             if proc_rank == 0:
                 logfile = open(os.path.join(self.cfg.LOG_PATH, (self.cfg.VERSION + '.txt')), 'a+')
-                logfile.write('nowTime: ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n')
+                logfile.write('epoch {} start time: '.format(epoch) + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n')
                 logfile.close()
 
             train_loader.sampler.set_epoch(epoch)
@@ -139,7 +139,7 @@ class Execution:
             for step, train_data in enumerate(train_loader):
                 proc_rank = self.cfg.GRANK if self.cfg.MP_STORAGE_SHR['screen'] else self.cfg.LRANK
                 if step % 1000 == 0 and proc_rank == 0:
-                    logging.info('[Epoch Trained: {:.2f} %][Lr: {:.7f}]'.format(step / len(train_loader) * 100.,
+                    logging.info('[Epoch Trained: {:.1f} %][Lr: {:.7f}]'.format(step / len(train_loader) * 100.,
                                                                                 np.array(net_optim.get_lr()).mean()))
 
                 text_input_ids, text_mask, \
