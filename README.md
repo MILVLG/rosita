@@ -4,7 +4,7 @@
 
 ## News & Update
 
-**v0.5 (15/08/2021)**
+**(15/08/2021)**
 
 - Release the basic framework for ROSITA, including the pretrained base ROSITA model, as well as the scripts to run the fine-tuning and evaluation on three downstream tasks (i.e., VQA, REC, ITR) over six datasets.
 
@@ -68,7 +68,7 @@ We compare ROSITA against existing state-of-the-art VLP methods on three downstr
 
 #### Software and Hardware Requirements
 
-You may need a machine with at least **4 GPU (>= 12GB)**, **20GB memory** and **50GB free disk space**. We strongly recommend to use a SSD drive to guarantee high-speed I/O. Also, you should first install some necessary package as follows:
+You may need a machine with at least **4 GPU (>= 24GB)**, **120GB memory** and **50GB free disk space**. We strongly recommend to use a SSD drive to guarantee high-speed I/O. Also, you should first install some necessary package as follows:
 
 - Python >= 3.6
 - PyTorch >= 1.4 with Cuda >=10.2
