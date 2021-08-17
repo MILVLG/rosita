@@ -79,7 +79,7 @@ class DataSet(Data.Dataset):
         return text_input_ids, text_mask
 
 
-    def __getitem__img(self, formatted_data):
+    def getitem__img(self, formatted_data):
         # Load image features
         img_src = formatted_data['img_src']
         img_filename = formatted_data['img_file']
@@ -142,9 +142,9 @@ class DataSet(Data.Dataset):
 
         if self.__C.IMGFEAT_FORMAT == 'tsv':
             formatted_data = self.load_formatted_data(idx)
-            imgfeat_input, imgfeat_mask, imgfeat_bbox = self.__getitem__img(formatted_data)
+            imgfeat_input, imgfeat_mask, imgfeat_bbox = self.getitem__img(formatted_data)
             neg_formatted_data = self.load_formatted_data(neg_img_idx_idx)
-            neg_imgfeat_input, neg_imgfeat_mask, neg_imgfeat_bbox = self.__getitem__img(neg_formatted_data)
+            neg_imgfeat_input, neg_imgfeat_mask, neg_imgfeat_bbox = self.getitem__img(neg_formatted_data)
 
             return pos_text_idx, imgfeat_input, imgfeat_mask, imgfeat_bbox,\
                     neg_text_idx, neg_imgfeat_input, neg_imgfeat_mask, neg_imgfeat_bbox
@@ -176,7 +176,7 @@ class DataSet(Data.Dataset):
             if formatted_data['img_file'] not in imgfeat_load_set:
                 assert formatted_data['img_file'] == self.ids_to_feat[str(len(imgfeat_load_set))]
                 imgfeat_load_set.add(formatted_data['img_file'])
-                imgfeat_input, imgfeat_mask, imgfeat_bbox = self.__getitem__img(formatted_data)
+                imgfeat_input, imgfeat_mask, imgfeat_bbox = self.getitem__img(formatted_data)
                 imgfeat_input_all.append(imgfeat_input.unsqueeze(0))
                 imgfeat_mask_all.append(imgfeat_mask.unsqueeze(0))
                 imgfeat_bbox_all.append(imgfeat_bbox.unsqueeze(0))

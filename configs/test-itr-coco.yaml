@@ -25,6 +25,7 @@ DATASET_LIST:
     - coco:testall
 
 # Features
+IMGFEAT_FORMAT: npz
 IMGFEAT_LIST:
   - coco:butd_res101_36-36_i32w_pyt
 

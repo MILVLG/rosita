@@ -119,15 +119,15 @@ class Execution:
             if epoch % self.cfg.NEG_NEPOCH == 0 and epoch >= self.cfg.NEG_START_EPOCH:
                 net.eval()
                 with torch.no_grad():
-                    # Hardest Negative Texts Hunter
+                    # Hardest Negative Texts Mining
                     proc_rank = self.cfg.GRANK if self.cfg.MP_STORAGE_SHR['screen'] else self.cfg.LRANK
                     if proc_rank == 0:
-                        logging.info('Hardest Negative Texts Hunt')
+                        logging.info('Hardest Negative Texts Mining')
                     neg_text_hard_ids_list = []
                     for step, data in enumerate(neg_text_loader):
                         proc_rank = self.cfg.GRANK if self.cfg.MP_STORAGE_SHR['screen'] else self.cfg.LRANK
                         if step % 10 == 0 and proc_rank == 0:
-                            logging.info(f'Hardest Negative Texts Hunt [{step / len(neg_text_loader) * 100}%]')
+                            logging.info(f'Hardest Negative Texts Mining [{step / len(neg_text_loader) * 100}%]')
 
                         if self.cfg.IMGFEAT_FORMAT == 'npz':
                             text_idx, img_idx, neg_idx = data
@@ -171,15 +171,15 @@ class Execution:
                     train_loader.dataset.neg_text_hard_ids = neg_text_hard_ids_list_gather
 
 
-                    # Hardest Negative Images Hunter
+                    # Hardest Negative Images Mining
                     proc_rank = self.cfg.GRANK if self.cfg.MP_STORAGE_SHR['screen'] else self.cfg.LRANK
                     if proc_rank == 0:
-                        logging.info('Hardest Negative Images Hunt')
+                        logging.info('Hardest Negative Images Mining')
                     neg_img_hard_ids_list = []
                     for step, data in enumerate(neg_img_loader):
                         proc_rank = self.cfg.GRANK if self.cfg.MP_STORAGE_SHR['screen'] else self.cfg.LRANK
                         if step % 10 == 0 and proc_rank == 0:
-                            logging.info(f'Hardest Negative Images Hunt [{step / len(neg_img_loader) * 100}%]')
+                            logging.info(f'Hardest Negative Images Mining [{step / len(neg_img_loader) * 100}%]')
 
                         if self.cfg.IMGFEAT_FORMAT == 'npz':
                             text_idx, img_idx, neg_idx = data
@@ -376,7 +376,10 @@ class Execution:
             col_x = math.ceil(total_size_x / bs_x)
             total_end_x = total_size_x
 
-            total_size_y = imgfeat_input_all.size(0)
+            if self.cfg.IMGFEAT_FORMAT == 'npz':
+                total_size_y = imgfeat_input_all.size(0)
+            else:
+                total_size_y = len(dataset.data_aggr) // 5
             row_y = math.ceil(total_size_y / (self.cfg.WORLD_SIZE * self.cfg.NODE_SIZE))
             logging.info(f'Steps [{row_y}]')
             base_y = row_y * self.cfg.GRANK
@@ -392,9 +395,17 @@ class Execution:
                 end_y = start_y + 1
                 if end_y > total_end_y:
                     break
-                imgfeat_input_ = imgfeat_input_all[start_y: end_y]
-                imgfeat_mask_ = imgfeat_mask_all[start_y: end_y]
-                imgfeat_bbox_ = imgfeat_bbox_all[start_y: end_y]
+                if self.cfg.IMGFEAT_FORMAT == 'npz':
+                    imgfeat_input_ = imgfeat_input_all[start_y: end_y]
+                    imgfeat_mask_ = imgfeat_mask_all[start_y: end_y]
+                    imgfeat_bbox_ = imgfeat_bbox_all[start_y: end_y]
+                else:
+                    start_idx = dataset.feat_idx_to_idx[str(start_y)]
+                    formatted_data = dataset.load_formatted_data(start_idx)
+                    imgfeat_input_, imgfeat_mask_, imgfeat_bbox_ = dataset.getitem__img(formatted_data)
+                    imgfeat_input_ = imgfeat_input_.unsqueeze(0)
+                    imgfeat_mask_ = imgfeat_mask_.unsqueeze(0)
+                    imgfeat_bbox_ = imgfeat_bbox_.unsqueeze(0)
 
                 for step_x in range(col_x):
                     start_x = step_x * bs_x
