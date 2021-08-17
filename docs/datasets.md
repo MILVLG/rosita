@@ -20,7 +20,7 @@ The image features are extracted using the commonly-used [bottom-up-attention](h
 ---
 ### Download the extracted features
 
-We provide the extracted image features for two datasets in `.tsv` format, namely [**mscoco_bua_r101_fix36.tar.gz**](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETVLb0s1EltHizf4mqk16a4BFzujqng5ffAIrAP48egZKQ?download=1) and [**flickr_bua_r101_fix36.tar.gz**](), corresponding to the features for `COCO` and `Flickr`, respectively. Using the command below to unzip the downloaded files to the proper places:
+We provide the extracted image features for two datasets in `.tsv` format, namely [**mscoco_bua_r101_fix36.tar.gz**](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ETVLb0s1EltHizf4mqk16a4BFzujqng5ffAIrAP48egZKQ?download=1) and [**flickr_bua_r101_fix36.tar.gz**](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EdBx9IhZWChGn3aOCgkTfFMBJxEL8g6DhUrIF47n-zQP5Q?download=1), corresponding to the features for `COCO` and `Flickr`, respectively. Using the command below to unzip the downloaded files to the proper places:
 ```bash
 $ tar -xzvf *_bua_r101_fix36.tar.gz datasets/imgfeats/
 ```
@@ -102,7 +102,7 @@ For each downstream task (i.e., dataset), we provide the formatted annotation fi
 
 ### Visual Question Answering (VQA)
 
-For the VQA task, we use VQAv2 datasets. You can download the formatted annotations [here]() and run the following command to unzip the annotations:
+For the VQA task, we use VQAv2 datasets. You can download the formatted annotations [here](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/Ed3QUwvH5SpJkb7lm2bOEXgBqG5OmWExbF0rUq3Es9fmYg?download=1) and run the following command to unzip the annotations:
 ```bash
 $ cd datasets/annotations
 $ tar -xzvf vqa-vqav2.tar.gz
@@ -133,7 +133,7 @@ After that, the `datasets` folder will have the following structure:
 
 ### Referring Expression Comprehension (REC)
 
-For the REC task, we use RefCOCO, RefCOCOplus, and RefCOCOg datasets. You can download the formatted annotations here ([RefCOCO](), [RefCOCOplus](), [RefCOCOg]()) and run the following commands to unzip the annotations:
+For the REC task, we use RefCOCO, RefCOCOplus, and RefCOCOg datasets. You can download the formatted annotations here ([RefCOCO](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EdhT3chPrkpBsXQrVspn0zUBdH2_hp1ee3Umo11Q5oGsGw?download=1), [RefCOCOplus](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EaEE3QzS9qZMu_sAdB2T1lMB1gNjrnGcjEF6uf04dF6RIQ?download=1), [RefCOCOg](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EYiM7AKo7IhGgyfDHh-VrfkBS18CWCmppQl_S8UtPNlnNg?download=1)) and run the following commands to unzip the annotations:
 ```bash
 $ cd datasets/annotations
 $ tar -xzvf rec-refcoco.tar.gz
@@ -158,7 +158,7 @@ $ tar -xzvf rec-refcocog.tar.gz
 
 ### Image-Text Retrieval (ITR)
 
-For the ITR task, we use ITR-COCO and ITR-Flickr Datasets. You can download the formatted annotations here ([ITR-COCO](), [ITR-Flickr]()) and run the following commands to unzip the annotations:
+For the ITR task, we use ITR-COCO and ITR-Flickr Datasets. You can download the formatted annotations here ([ITR-COCO](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EWtpywySxi9IpR2TPJNqHzoBxj06VBQ0jY9vqJZ8RFeQvg?download=1), [ITR-Flickr](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EdVASEDfmIxClmSzNS6SKCIBJecUrGVKTYa5zBCJMKsepQ?download=1)) and run the following commands to unzip the annotations:
 ```bash
 $ cd datasets/annotations
 $ tar -xzvf itr-coco.tar.gz
