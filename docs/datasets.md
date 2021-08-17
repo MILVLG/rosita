@@ -3,9 +3,9 @@
 The Datasets contains **Image Region Features** and **Text Annotations** two parts. And the `datasets` folder has the following structure:
 ```
 |-- datasets
-	|-- imgfeats
+    |-- imgfeats
     |   |-- ...
-	|-- annotations
+    |-- annotations
         |-- ...
 
 ```
@@ -45,7 +45,7 @@ The `{$NPZ_DIR}` should be a folder contains `.npz` format features, and the `{$
 After preparing the visual features, the `datasets` folder will have the following structure:
 ```
 |-- datasets
-	|-- imgfeats
+    |-- imgfeats
     |   |-- {$COCO_TSV_DIR}
     |   |   |-- imgfeat.tsv
     |   |   |-- imgfeat.lineidx
@@ -54,10 +54,11 @@ After preparing the visual features, the `datasets` folder will have the followi
     |       |-- imgfeat.tsv
     |       |-- imgfeat.lineidx
     |       |-- img_feat_offset_map.json
-	|-- annotations
+    |-- annotations
         |-- ...
 
 ```
+
 The `{$COCO_TSV_DIR}` and the `{$Flickr_TSV_DIR}` are the `{$TSV_DIR}` folders for COCO and Flickr respectively. And you need to make sure that the config files are using these folders. We use `mscoco_bua_r101_fix36` and `flickr_bua_r101_fix36` for `{$COCO_TSV_DIR}` and `{$Flickr_TSV_DIR}` by default. 
 
 ---
@@ -72,7 +73,7 @@ The `{$DATASETS_DIR}` should be the path to `datasets/imgfeats/` folder. After u
 After that, the `datasets` folder will have the following structure:
 ```
 |-- datasets
-	|-- imgfeats
+    |-- imgfeats
     |   |-- mscoco_bua_r101_fix36
     |   |   |-- imgfeat.tsv
     |   |   |-- imgfeat.lineidx
@@ -81,7 +82,7 @@ After that, the `datasets` folder will have the following structure:
     |       |-- imgfeat.tsv
     |       |-- imgfeat.lineidx
     |       |-- img_feat_offset_map.json
-	|-- annotations
+    |-- annotations
         |-- ...
 
 ```
@@ -105,9 +106,9 @@ The last 4 files are used to do evaluation on val and minival split.
 After that, the `datasets` folder will have the following structure:
 ```
 |-- datasets
-	|-- imgfeats
+    |-- imgfeats
     |   |-- ...
-	|-- annotations
+    |-- annotations
         |-- vqa-vqav2
         |   |-- vqa_vqav2_annotations.json
         |   |-- v2_mscoco_val2014_annotations.json
@@ -135,9 +136,9 @@ The `{$ANNO_DIR}` is the path to `datasets/annotations` folder. After unzip, the
 After that, the `datasets` folder will have the following structure:
 ```
 |-- datasets
-	|-- imgfeats
+    |-- imgfeats
     |   |-- ...
-	|-- annotations
+    |-- annotations
         |-- rec-refcoco
         |   |-- rec_refcoco_annotations.json
         |-- rec-refcocoplus
@@ -168,9 +169,9 @@ The `img_text_map.json` files are used to:
 After that, the `datasets` folder will have the following structure:
 ```
 |-- datasets
-	|-- imgfeats
+    |-- imgfeats
     |   |-- ...
-	|-- annotations
+    |-- annotations
         |-- itr-coco
         |   |-- itr_coco_annotations.json
         |   |-- img_text_map.json
@@ -186,7 +187,7 @@ After that, the `datasets` folder will have the following structure:
 Finally, the `datasets` folder will have the following structure:
 ```
 |-- datasets
-	|-- imgfeats
+    |-- imgfeats
     |   |-- mscoco_bua_r101_fix36
     |   |   |-- imgfeat.tsv
     |   |   |-- imgfeat.lineidx
@@ -195,7 +196,7 @@ Finally, the `datasets` folder will have the following structure:
     |       |-- imgfeat.tsv
     |       |-- imgfeat.lineidx
     |       |-- img_feat_offset_map.json
-	|-- annotations
+    |-- annotations
         |-- vqa-vqav2
         |   |-- vqa_vqav2_annotations.json
         |   |-- v2_mscoco_val2014_annotations.json
