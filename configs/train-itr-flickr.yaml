@@ -15,8 +15,8 @@ EVAL_BATCH_SIZE: 600
 # Load ckpt
 CKPT_FILE: ckpts/rosita-base.pkl
 
-# CKPT_LOAD_MAP:
-#   mm_itm_head: mm_itm_head
+CKPT_LOAD_MAP:
+  mm_itm_head: mm_itm_head
 
 CKPT_SAVE_MAP:
   mm_itm_head: mm_itm_head
@@ -24,11 +24,11 @@ CKPT_SAVE_MAP:
 # Datasets
 DATASET_LIST:
   train:
-    - flickr:train
+    - itr-flickr:train
   val:
-    - flickr:test
+    - itr-flickr:test
   test:
-    - flickr:test
+    - itr-flickr:test
 
 # Features
 IMGFEAT_FORMAT: tsv

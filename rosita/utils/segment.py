@@ -35,7 +35,7 @@ class TextSegment:
         for dataset_name in self.__C.DATASET_LIST[self.RUN_MODE]:
             tset = dataset_name.split(':')[0]
             ttype = dataset_name.split(':')[1]
-            formatted_data = json.load(open(self.__C.DATASET_ROOTPATH_MAP[tset], 'r'))[ttype]
+            formatted_data = json.load(open(self.__C.DATASET_ANNO_MAP[tset], 'r'))[ttype]
             data_aggr += formatted_data
             logging.info('[segment: {}] loading [{}] data: {}'.format(self.RUN_MODE, dataset_name, len(formatted_data)))
 

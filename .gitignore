@@ -129,5 +129,5 @@ dmypy.json
 .pyre/
 
 /ckpts/*
-/datasets/*
+/datasets
 /outputs/*

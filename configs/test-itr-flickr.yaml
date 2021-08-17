@@ -21,11 +21,11 @@ CKPT_SAVE_MAP:
 # Datasets
 DATASET_LIST:
   train:
-    - flickr:train
+    - itr-flickr:train
   val:
-    - flickr:test
+    - itr-flickr:test
   test:
-    - flickr:test
+    - itr-flickr:test
 
 # Features
 IMGFEAT_FORMAT: tsv

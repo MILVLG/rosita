@@ -106,42 +106,46 @@ class Execution:
         grad_norm = np.zeros(len(named_params))
 
         text_input_ids_all, text_mask_all, \
-        imgfeat_input_all, imgfeat_mask_all, imgfeat_bbox_all, imgfeat_relation_all = train_loader.dataset.load_all_data()
+        imgfeat_input_all, imgfeat_mask_all, imgfeat_bbox_all = train_loader.dataset.load_all_data()
         all_eval_data = eval_dataset.load_all_data()
         
         for epoch in range(start_epoch, self.cfg.MAX_EPOCH):
             proc_rank = self.cfg.GRANK if self.cfg.MP_STORAGE_SHR['ckpt'] else self.cfg.LRANK
             if proc_rank == 0:
                 logfile = open(os.path.join(self.cfg.LOG_PATH, (self.cfg.VERSION + '.txt')), 'a+')
-                logfile.write('nowTime: ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n')
+                logfile.write('epoch {} start time: '.format(epoch) + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n')
                 logfile.close()
 
             if epoch % self.cfg.NEG_NEPOCH == 0 and epoch >= self.cfg.NEG_START_EPOCH:
                 net.eval()
                 with torch.no_grad():
-                    # Hardest Negative Texts Hunter
+                    # Hardest Negative Texts Mining
                     proc_rank = self.cfg.GRANK if self.cfg.MP_STORAGE_SHR['screen'] else self.cfg.LRANK
                     if proc_rank == 0:
-                        logging.info('Hardest Negative Texts Hunt')
+                        logging.info('Hardest Negative Texts Mining')
                     neg_text_hard_ids_list = []
                     for step, data in enumerate(neg_text_loader):
                         proc_rank = self.cfg.GRANK if self.cfg.MP_STORAGE_SHR['screen'] else self.cfg.LRANK
                         if step % 10 == 0 and proc_rank == 0:
-                            logging.info(f'Hardest Negative Texts Hunt [{step / len(neg_text_loader) * 100}%]')
+                            logging.info(f'Hardest Negative Texts Mining [{step / len(neg_text_loader) * 100}%]')
 
-                        text_idx, img_idx, neg_idx = data
-                        text_idx = text_idx.view(-1)
-                        img_idx = img_idx.view(-1)
-
-                        text_input_ids = text_input_ids_all[text_idx, :]
-                        text_mask = text_mask_all[text_idx, :]
-                        imgfeat_input = imgfeat_input_all[img_idx, :]
-                        imgfeat_mask = imgfeat_mask_all[img_idx, :]
-                        imgfeat_bbox = imgfeat_bbox_all[img_idx, :]
-
-                        # print('imgfeat_input size:', imgfeat_input.shape)
-                        # text_input_ids = text_input_ids_all[text_idx, :]
-                        # print('text_input_ids size:', text_input_ids.shape)
+                        if self.cfg.IMGFEAT_FORMAT == 'npz':
+                            text_idx, img_idx, neg_idx = data
+                            text_idx = text_idx.view(-1)
+                            img_idx = img_idx.view(-1)
+                            text_input_ids = text_input_ids_all[text_idx, :]
+                            text_mask = text_mask_all[text_idx, :]
+                            imgfeat_input = imgfeat_input_all[img_idx, :]
+                            imgfeat_mask = imgfeat_mask_all[img_idx, :]
+                            imgfeat_bbox = imgfeat_bbox_all[img_idx, :]
+                        else:
+                            text_idx, imgfeat_input, imgfeat_mask, imgfeat_bbox, neg_idx = data
+                            text_idx = text_idx.view(-1)
+                            text_input_ids = text_input_ids_all[text_idx, :]
+                            text_mask = text_mask_all[text_idx, :]
+                            imgfeat_input = imgfeat_input.view(-1, imgfeat_input.size(2), imgfeat_input.size(3))
+                            imgfeat_mask = imgfeat_mask.view(-1, imgfeat_mask.size(2))
+                            imgfeat_bbox = imgfeat_bbox.view(-1, imgfeat_bbox.size(2), imgfeat_bbox.size(3))
 
                         text_input_ids = text_input_ids.to(self.cfg.DEVICE_IDS[0])
                         text_mask = text_mask.to(self.cfg.DEVICE_IDS[0])
@@ -167,25 +171,34 @@ class Execution:
                     train_loader.dataset.neg_text_hard_ids = neg_text_hard_ids_list_gather
 
 
-                    # Hardest Negative Images Hunter
+                    # Hardest Negative Images Mining
                     proc_rank = self.cfg.GRANK if self.cfg.MP_STORAGE_SHR['screen'] else self.cfg.LRANK
                     if proc_rank == 0:
-                        logging.info('Hardest Negative Images Hunt')
+                        logging.info('Hardest Negative Images Mining')
                     neg_img_hard_ids_list = []
                     for step, data in enumerate(neg_img_loader):
                         proc_rank = self.cfg.GRANK if self.cfg.MP_STORAGE_SHR['screen'] else self.cfg.LRANK
                         if step % 10 == 0 and proc_rank == 0:
-                            logging.info(f'Hardest Negative Images Hunt [{step / len(neg_img_loader) * 100}%]')
+                            logging.info(f'Hardest Negative Images Mining [{step / len(neg_img_loader) * 100}%]')
 
-                        text_idx, img_idx, neg_idx = data
-                        text_idx = text_idx.view(-1)
-                        img_idx = img_idx.view(-1)
+                        if self.cfg.IMGFEAT_FORMAT == 'npz':
+                            text_idx, img_idx, neg_idx = data
 
-                        text_input_ids = text_input_ids_all[text_idx, :]
-                        text_mask = text_mask_all[text_idx, :]
-                        imgfeat_input = imgfeat_input_all[img_idx, :]
-                        imgfeat_mask = imgfeat_mask_all[img_idx, :]
-                        imgfeat_bbox = imgfeat_bbox_all[img_idx, :]
+                            text_idx = text_idx.view(-1)
+                            img_idx = img_idx.view(-1)
+                            text_input_ids = text_input_ids_all[text_idx, :]
+                            text_mask = text_mask_all[text_idx, :]
+                            imgfeat_input = imgfeat_input_all[img_idx, :]
+                            imgfeat_mask = imgfeat_mask_all[img_idx, :]
+                            imgfeat_bbox = imgfeat_bbox_all[img_idx, :]
+                        else:
+                            text_idx, imgfeat_input, imgfeat_mask, imgfeat_bbox, neg_idx = data
+                            text_idx = text_idx.view(-1)
+                            text_input_ids = text_input_ids_all[text_idx, :]
+                            text_mask = text_mask_all[text_idx, :]
+                            imgfeat_input = imgfeat_input.view(-1, imgfeat_input.size(2), imgfeat_input.size(3))
+                            imgfeat_mask = imgfeat_mask.view(-1, imgfeat_mask.size(2))
+                            imgfeat_bbox = imgfeat_bbox.view(-1, imgfeat_bbox.size(2), imgfeat_bbox.size(3))
 
                         text_input_ids = text_input_ids.to(self.cfg.DEVICE_IDS[0])
                         text_mask = text_mask.to(self.cfg.DEVICE_IDS[0])
@@ -222,18 +235,27 @@ class Execution:
                     logging.info('[Epoch Trained: {:.2f} %][Lr: {:.7f}]'.format(step / len(train_loader) * 100.,
                                                                                 np.array(net_optim.get_lr()).mean()))
 
-                pos_text_idx, pos_img_idx, neg_text_idx, neg_img_idx = train_data
-                
-                text_input_ids = text_input_ids_all[pos_text_idx, :]
-                text_mask = text_mask_all[pos_text_idx, :]
-                imgfeat_input = imgfeat_input_all[pos_img_idx, :]
-                imgfeat_mask = imgfeat_mask_all[pos_img_idx, :]
-                imgfeat_bbox = imgfeat_bbox_all[pos_img_idx, :]
-                neg_text_input_ids = text_input_ids_all[neg_text_idx, :]
-                neg_text_mask = text_mask_all[neg_text_idx, :]
-                neg_imgfeat_input = imgfeat_input_all[neg_img_idx, :]
-                neg_imgfeat_mask = imgfeat_mask_all[neg_img_idx, :]
-                neg_imgfeat_bbox = imgfeat_bbox_all[neg_img_idx, :]
+                if self.cfg.IMGFEAT_FORMAT == 'npz':
+                    pos_text_idx, pos_img_idx, neg_text_idx, neg_img_idx = train_data
+                    
+                    text_input_ids = text_input_ids_all[pos_text_idx, :]
+                    text_mask = text_mask_all[pos_text_idx, :]
+                    imgfeat_input = imgfeat_input_all[pos_img_idx, :]
+                    imgfeat_mask = imgfeat_mask_all[pos_img_idx, :]
+                    imgfeat_bbox = imgfeat_bbox_all[pos_img_idx, :]
+                    neg_text_input_ids = text_input_ids_all[neg_text_idx, :]
+                    neg_text_mask = text_mask_all[neg_text_idx, :]
+                    neg_imgfeat_input = imgfeat_input_all[neg_img_idx, :]
+                    neg_imgfeat_mask = imgfeat_mask_all[neg_img_idx, :]
+                    neg_imgfeat_bbox = imgfeat_bbox_all[neg_img_idx, :]
+                else:
+                    pos_text_idx, imgfeat_input, imgfeat_mask, imgfeat_bbox,\
+                    neg_text_idx, neg_imgfeat_input, neg_imgfeat_mask, neg_imgfeat_bbox = train_data
+
+                    text_input_ids = text_input_ids_all[pos_text_idx, :]
+                    text_mask = text_mask_all[pos_text_idx, :]
+                    neg_text_input_ids = text_input_ids_all[neg_text_idx, :]
+                    neg_text_mask = text_mask_all[neg_text_idx, :]
 
                 text_input_ids = text_input_ids.to(self.cfg.DEVICE_IDS[0])
                 text_mask = text_mask.to(self.cfg.DEVICE_IDS[0])
@@ -341,14 +363,17 @@ class Execution:
         net.eval()
         with torch.no_grad():
             text_input_ids_all, text_mask_all, \
-            imgfeat_input_all, imgfeat_mask_all, imgfeat_bbox_all, imgfeat_relation_all = all_data
+            imgfeat_input_all, imgfeat_mask_all, imgfeat_bbox_all = all_data
 
             bs_x = self.cfg.EVAL_BATCH_SIZE
             total_size_x = text_input_ids_all.size(0)
             col_x = math.ceil(total_size_x / bs_x)
             total_end_x = total_size_x
 
-            total_size_y = imgfeat_input_all.size(0)
+            if self.cfg.IMGFEAT_FORMAT == 'npz':
+                total_size_y = imgfeat_input_all.size(0)
+            else:
+                total_size_y = len(dataset.data_aggr) // 5
             row_y = math.ceil(total_size_y / (self.cfg.WORLD_SIZE * self.cfg.NODE_SIZE))
             logging.info(f'Steps [{row_y}]')
             base_y = row_y * self.cfg.GRANK
@@ -364,9 +389,17 @@ class Execution:
                 end_y = start_y + 1
                 if end_y > total_end_y:
                     break
-                imgfeat_input_ = imgfeat_input_all[start_y: end_y]
-                imgfeat_mask_ = imgfeat_mask_all[start_y: end_y]
-                imgfeat_bbox_ = imgfeat_bbox_all[start_y: end_y]
+                if self.cfg.IMGFEAT_FORMAT == 'npz':
+                    imgfeat_input_ = imgfeat_input_all[start_y: end_y]
+                    imgfeat_mask_ = imgfeat_mask_all[start_y: end_y]
+                    imgfeat_bbox_ = imgfeat_bbox_all[start_y: end_y]
+                else:
+                    start_idx = dataset.feat_idx_to_idx[str(start_y)]
+                    formatted_data = dataset.load_formatted_data(start_idx)
+                    imgfeat_input_, imgfeat_mask_, imgfeat_bbox_ = dataset.getitem__img(formatted_data)
+                    imgfeat_input_ = imgfeat_input_.unsqueeze(0)
+                    imgfeat_mask_ = imgfeat_mask_.unsqueeze(0)
+                    imgfeat_bbox_ = imgfeat_bbox_.unsqueeze(0)
 
                 for step_x in range(col_x):
                     start_x = step_x * bs_x

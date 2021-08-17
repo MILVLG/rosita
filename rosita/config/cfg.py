@@ -75,7 +75,7 @@ class Cfg(Path):
         self.USE_BBOXFEAT = True
         self.BBOXFEAT_SIZE = 5
 
-        imgfeat_type = 'butd_res101_36-36_i32w_pyt'
+        imgfeat_type = 'bua_r101_fix36'
         self.IMGFEAT_FORMAT = 'tsv'
         self.IMGFEAT_LIST = [
             'coco:' + imgfeat_type,

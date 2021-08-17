@@ -19,7 +19,7 @@ def vqa_eval(__C, loader, net, valid=False):
     for step, data in enumerate(loader):
         proc_rank = __C.GRANK if __C.MP_STORAGE_SHR['eval'] else __C.LRANK
         if step % 100 == 0 and proc_rank == 0:
-            logging.info('Evaluated [{:.2f} %]'.format(step / len(loader) * 100.))
+            logging.info('Evaluated [{:.1f} %]'.format(step / len(loader) * 100.))
 
         text_input_ids, text_mask, \
         imgfeat_input, imgfeat_mask, imgfeat_bbox, \
@@ -73,13 +73,15 @@ def vqa_eval(__C, loader, net, valid=False):
         # create vqa object and vqaRes object
         eval_set = __C.DATASET_LIST['val'][0].split(':')[1]
         if eval_set in ['val']:
-            ques_file_path = os.path.join(__C.DATASET_ROOTPATH, __C.DATASET_PATHMAP[
-                'vqa'], 'v2_Questions_Val_mscoco/v2_OpenEnded_mscoco_val2014_questions.json')
-            ans_file_path = os.path.join(__C.DATASET_ROOTPATH, __C.DATASET_PATHMAP[
-                'vqa'], 'v2_Annotations_Val_mscoco/v2_mscoco_val2014_annotations.json')
+            ques_file_path = os.path.join(__C.DATASET_PATHMAP[ 'vqa-vqav2'], 
+                'v2_Questions_Val_mscoco/v2_OpenEnded_mscoco_val2014_questions.json')
+            ans_file_path = os.path.join(__C.DATASET_PATHMAP['vqa-vqav2'],
+                'v2_Annotations_Val_mscoco/v2_mscoco_val2014_annotations.json')
         elif eval_set in ['minival']:
-            ques_file_path = os.path.join(__C.DATASET_ROOTPATH, __C.DATASET_PATHMAP['vqa'], 'ques_minival.json')
-            ans_file_path = os.path.join(__C.DATASET_ROOTPATH, __C.DATASET_PATHMAP['vqa'], 'anno_minival.json')
+            ques_file_path = os.path.join(__C.DATASET_PATHMAP['vqa-vqav2'],  
+                'v2_Questions_Val_mscoco/v2_OpenEnded_mscoco_minival2014_questions.json')
+            ans_file_path = os.path.join(__C.DATASET_PATHMAP['vqa-vqav2'],
+                'v2_Annotations_Val_mscoco/v2_mscoco_minival2014_annotations.json')
 
         vqa = VQA(ans_file_path, ques_file_path)
         vqaRes = vqa.loadRes(result_eval_file, ques_file_path)
@@ -96,15 +98,15 @@ def vqa_eval(__C, loader, net, valid=False):
 
         # loggin accuracies
         logging.info("\n")
-        logging.info("Overall Accuracy is: %.02f\n" % (vqaEval.accuracy['overall']))
+        logging.info("Overall Accuracy is: %.01f\n" % (vqaEval.accuracy['overall']))
         logging.info("Per Answer Type Accuracy is the following:")
         for ansType in vqaEval.accuracy['perAnswerType']:
-            logging.info("%s : %.02f" % (ansType, vqaEval.accuracy['perAnswerType'][ansType]))
+            logging.info("%s : %.01f" % (ansType, vqaEval.accuracy['perAnswerType'][ansType]))
         logging.info("\n")
 
         logfile = open(os.path.join(__C.LOG_PATH, (__C.VERSION + '.txt')), 'a+')
-        logfile.write("Overall Accuracy is: %.02f\n" % (vqaEval.accuracy['overall']))
+        logfile.write("Overall Accuracy is: %.01f\n" % (vqaEval.accuracy['overall']))
         for ansType in vqaEval.accuracy['perAnswerType']:
-            logfile.write("%s : %.02f " % (ansType, vqaEval.accuracy['perAnswerType'][ansType]))
+            logfile.write("%s : %.01f " % (ansType, vqaEval.accuracy['perAnswerType'][ansType]))
         logfile.write("\n\n")
         logfile.close()

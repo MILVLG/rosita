@@ -21,11 +21,11 @@ CKPT_SAVE_MAP:
 # Datasets
 DATASET_LIST:
   train:
-    - coco:train
+    - itr-coco:train
   val:
-    - coco:test
+    - itr-coco:test
   test:
-    - coco:testall
+    - itr-coco:testall
 
 # Features
 IMGFEAT_FORMAT: tsv
