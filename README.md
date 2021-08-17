@@ -10,10 +10,11 @@
 
 ## Introduction
 
-This repository contains source code necessary to reproduce the results presented in our ACM MM paper [ROSITA: Enhancing Vision-and-Language Semantic Alignments via Cross- and Intra-modal Knowledge Integration](https://arxiv.org/abs/2004.06165), which encodes the c**ROS**s- and **I**n**T**r**A**-model prior knowledge in a in a unified scene graph to perform knowledge-guided vision-and-language pretraining. Compared with existing counterparts, ROSITA learns better fine-grained **semantic alignments** across different modalities, thus improving the capability of the pretrained model. 
+This repository contains source code necessary to reproduce the results presented in our ACM MM paper [ROSITA: Enhancing Vision-and-Language Semantic Alignments via Cross- and Intra-modal Knowledge Integration](https://arxiv.org/abs/2108.07073), which encodes the c**ROS**s- and **I**n**T**r**A**-model prior knowledge in a in a unified scene graph to perform knowledge-guided vision-and-language pretraining. Compared with existing counterparts, ROSITA learns better fine-grained **semantic alignments** across different modalities, thus improving the capability of the pretrained model. 
 
-![example-image](misc/rosita.png?raw=true)
-<!-- <img src="misc\rosita.png" width="900"> -->
+<div align="center">
+  <img src="misc\rosita.png"/>
+</div>
 
 ## Performance
 
