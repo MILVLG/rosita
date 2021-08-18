@@ -9,7 +9,7 @@
 
 ## Introduction
 
-This repository contains source code necessary to reproduce the results presented in our ACM MM paper [ROSITA: Enhancing Vision-and-Language Semantic Alignments via Cross- and Intra-modal Knowledge Integration](https://arxiv.org/abs/2108.07073), which encodes the c**ROS**s- and **I**n**T**r**A**-model prior knowledge in a in a unified scene graph to perform knowledge-guided vision-and-language pretraining. Compared with existing counterparts, ROSITA learns better fine-grained **semantic alignments** across different modalities, thus improving the capability of the pretrained model. 
+This repository contains source code necessary to reproduce the results presented in our ACM MM paper [ROSITA: Enhancing Vision-and-Language Semantic Alignments via Cross- and Intra-modal Knowledge Integration](https://arxiv.org/abs/2108.07073), which encodes the c**ROS**s- and **I**n**T**r**A**-model prior knowledge in a in a unified scene graph to perform knowledge-guided vision-and-language pretraining. Compared with existing counterparts, ROSITA learns better **fine-grained semantic alignments** across different modalities, thus improving the capability of the pretrained model. 
 
 <div align="center">
   <img src="misc\rosita.png"/>
@@ -69,7 +69,7 @@ We compare ROSITA against existing state-of-the-art VLP methods on three downstr
 
 #### Software and Hardware Requirements
 
-You may need a machine with at least **4 GPU (>= 24GB)**, **120GB memory** and **50GB free disk space**. We strongly recommend to use a SSD drive to guarantee high-speed I/O. Also, you should first install some necessary package as follows:
+We recommand a workstation with **4 GPU (>= 24GB, e.g., RTX 3090 or V100)**, **120GB memory** and **50GB free disk space**. We strongly recommend to use a SSD drive to guarantee high-speed I/O. Also, you should first install some necessary package as follows:
 
 - Python >= 3.6
 - PyTorch >= 1.4 with Cuda >=10.2
@@ -103,7 +103,9 @@ Please check [finetune.md](docs/finetune.md) for the details for finetuning on d
 
 ## Acknowledgment
 
-We refer to some well-organized VLP implementations like [LXMERT](https://github.com/airsplay/lxmert), [UNITER](https://github.com/ChenRocks/UNITER), and [OSCAR](https://github.com/microsoft/Oscar) when writing the source codes. Yuhao Cui ([@cuiyuhao1996](https://github.com/cuiyuhao1996)) and Tong-An Luo ([@Zoroaster97](https://github.com/Zoroaster97)) are the main contributors to this repository. Please kindly contact them if you find any issue.
+We appreciate the well-known open-source projects such as [LXMERT](https://github.com/airsplay/lxmert), [UNITER](https://github.com/ChenRocks/UNITER), [OSCAR](https://github.com/microsoft/Oscar), and [Huggingface](https://github.com/huggingface/transformers), which help us a lot when writing our codes. 
+
+Yuhao Cui ([@cuiyuhao1996](https://github.com/cuiyuhao1996)) and Tong-An Luo ([@Zoroaster97](https://github.com/Zoroaster97)) are the main contributors to this repository. Please kindly contact them if you find any issue.
 
 
 ## Citations
