@@ -124,7 +124,7 @@ class Execution:
             proc_rank = self.cfg.GRANK if self.cfg.MP_STORAGE_SHR['ckpt'] else self.cfg.LRANK
             if proc_rank == 0:
                 logfile = open(os.path.join(self.cfg.LOG_PATH, (self.cfg.VERSION + '.txt')), 'a+')
-                logfile.write('epoch {} start time: '.format(epoch) + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n')
+                logfile.write('[epoch {} start time: '.format(epoch + 1) + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ']\n')
                 logfile.close()
 
             train_loader.sampler.set_epoch(epoch)
@@ -172,7 +172,7 @@ class Execution:
                 proc_rank = self.cfg.GRANK if self.cfg.MP_STORAGE_SHR['screen'] else self.cfg.LRANK
                 if step % 100 == 0 and proc_rank == 0:
                     logging.info(
-                        '[epoch: {}][step: {} | {}] - [total: {:.4f}][mm_qa: {:.4f}]'.format(
+                        '[epoch: {}][step: {} | {}] - [total loss: {:.4f}][mm_qa loss: {:.4f}]'.format(
                             epoch + 1, step, len(train_loader), total_loss.item(), loss.item()))
 
                 # gradient clipping
@@ -200,7 +200,7 @@ class Execution:
 
                 logfile = open(os.path.join(self.cfg.LOG_PATH, (self.cfg.VERSION + '.txt')), 'a+')
                 logfile.write(
-                    '[epoch: {}][lr: {:.7f}]\n[total: {:.4f}][mm_qa: {:.4f}]\n'.format(
+                    '[epoch: {}][lr: {:.7f}]\n[total loss: {:.4f}][mm_qa loss: {:.4f}]\n'.format(
                         epoch_finish, np.array(net_optim.get_lr()).mean(), total_loss_sum / len(train_loader),
                         mm_qa_loss_sum / len(train_loader)))
                 logfile.close()
