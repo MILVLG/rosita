@@ -129,5 +129,9 @@ dmypy.json
 .pyre/
 
 /ckpts/*
-/datasets
+/datasets/annotations/*
+!/datasets/annotations/.gitkeep
+/datasets/imgfeats/*
+!/datasets/imgfeats/.gitkeep
 /outputs/*
+!/outputs/.gitkeep
