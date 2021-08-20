@@ -167,6 +167,7 @@ class Cfg(Path):
         self.GRANK = global_rank
         self.LRANK = local_rank
         self.DEVICE_IDS = list(range(self.LRANK * self.N_GPU, (self.LRANK + 1) * self.N_GPU))
+        print('DEVICE IDS:', self.DEVICE_IDS)
 
 
     def parse_to_dict(self, args):

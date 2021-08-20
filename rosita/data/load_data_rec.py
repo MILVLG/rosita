@@ -80,7 +80,6 @@ class DataSet(Data.Dataset):
             imgfeat['objects_conf'] = np.frombuffer(base64.b64decode(row[7]), dtype=np.float32)
             imgfeat['attrs_id'] = np.frombuffer(base64.b64decode(row[8]), dtype=np.float32)
             imgfeat['attrs_conf'] = np.frombuffer(base64.b64decode(row[9]), dtype=np.float32)
-
         else:
             imgfeat = self.load_npz(img_src, img_filename)
 

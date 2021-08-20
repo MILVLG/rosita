@@ -10,6 +10,8 @@ import logging
 class Path:
     def __init__(self):
         
+        self.RUN_MODE = None
+        
         self.IMGFEAT_TYPE_MAP = {}
         self.DATASET_ROOTPATH = 'datasets'
         self.OUTPATH = 'outputs'

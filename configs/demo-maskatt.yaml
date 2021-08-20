@@ -1,0 +1,43 @@
+VERSION: demo-maskatt
+RUN_MODE: test
+DATASET_ROOTPATH: datasets
+OUTPATH: outputs
+
+# N_GPU: 1
+
+# Workers and batch size
+NUM_WORKERS: 0
+BATCH_SIZE: 1
+EVAL_BATCH_SIZE: 1
+
+# Load ckpt
+CKPT_FILE: ckpts/rosita-base.pkl
+# CKPT_FILE: ckpts/demo_maskatt2.pkl  # rs-20_epoch20.pkl
+# CKPT_FILE: ckpts/demo_maskatt.pkl # rs-38_epoch40.pkl rs-20_epoch20.pkl
+
+# Datasets
+DATASET_LIST:
+  test:
+    - itr-coco:dev
+
+# Features
+# IMGFEAT_FORMAT: npz
+IMGFEAT_FORMAT: tsv
+
+# ITR Params
+NEG_BATCHSIZE: 25
+NEG_RANDSIZE: 128
+NEG_HARDSIZE: 5
+NEG_NEPOCH: 1
+NEG_START_EPOCH: 0
+
+# Model Params
+PAD_MAX:
+  text: 20
+  image: 36
+
+TASKS:
+  text:
+    - mlm
+  image:
+    - obj

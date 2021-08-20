@@ -331,6 +331,7 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
+    os.environ['CUDA_VISIBLE_DEVICES'] = args.GPU
 
     WORLD_SIZE = len(args.GPU.split(','))
     __C = Cfg(WORLD_SIZE, args)
@@ -343,7 +344,6 @@ if __name__ == '__main__':
     __C.add_args(yaml_dict)
     __C.proc(args.resume)
     print(__C)
-    os.environ['CUDA_VISIBLE_DEVICES'] = args.GPU
     if args.MASTER_PORT == 'auto':
         args.MASTER_PORT = str(random.randint(13390, 17799))
     print('MASTER_ADDR:', args.MASTER_ADDR)
