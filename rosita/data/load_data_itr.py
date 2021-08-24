@@ -112,7 +112,6 @@ class DataSet(Data.Dataset):
 
         # Padding and process bbox relation
         imgfeat_bbox = self.proc_bbox(boxes, (image_h, image_w))
-        # imgfeat_relation = self.relation_embedding(torch.from_numpy(boxes.astype(np.float32)))  # [n_obj, n_obj, 4]
         imgfeat_input, imgfeat_mask, imgfeat_bbox = self.proc_imgfeat(imgfeat_input, imgfeat_bbox)
 
         imgfeat_input = torch.from_numpy(imgfeat_input)
@@ -214,17 +213,6 @@ class DataSet(Data.Dataset):
         return vocab
 
 
-    @staticmethod
-    def sets_to_idmap(ans_sets):
-        ans_to_ix = {}
-        ix_to_ans = {}
-        for ans in ans_sets:
-            ix_to_ans[len(ans_to_ix)] = ans
-            ans_to_ix[ans] = len(ans_to_ix)
-
-        return ans_to_ix, ix_to_ans
-
-
     def load_npz(self, img_src, img_filename):
         np_file = os.path.join(self.__C.IMGFEAT_PATHMAP[img_src], 'npz_files', (img_filename + '.npz'))
         npz_loaded = np.load(np_file)
@@ -274,9 +262,6 @@ class DataSet(Data.Dataset):
         imgfeat_input = self.np_pad_2d(imgfeat_input, length_pad)
         imgfeat_bbox = self.np_pad_2d(imgfeat_bbox, length_pad)
 
-        # imgfeat_relation_padded = torch.zeros(length_pad, length_pad, 4)
-        # imgfeat_relation_padded[:imgfeat_relation.size(0), :imgfeat_relation.size(1), :] = imgfeat_relation[:]
-
         return imgfeat_input, imgfeat_mask, imgfeat_bbox
 
 
@@ -291,37 +276,6 @@ class DataSet(Data.Dataset):
         bbox_feat[:, 4] = (bbox[:, 2] - bbox[:, 0]) * (bbox[:, 3] - bbox[:, 1]) / float(img_shape[0] * img_shape[1])
 
         return bbox_feat
-
-
-    # def relation_embedding(self, f_g):
-    #     x_min, y_min, x_max, y_max = torch.chunk(f_g, 4, dim=1)  # [n_obj, 1]
-
-    #     cx = (x_min + x_max) * 0.5  # [n_obj, 1]
-    #     cy = (y_min + y_max) * 0.5  # [n_obj, 1]
-    #     w = (x_max - x_min) + 1.  # [n_obj, 1]
-    #     h = (y_max - y_min) + 1.  # [n_obj, 1]
-
-    #     delta_x = cx - cx.view(1, -1)
-    #     delta_x = torch.clamp(torch.abs(delta_x / w), min=1e-3)
-    #     delta_x = torch.log(delta_x)  # [n_obj, n_obj]
-
-    #     delta_y = cy - cy.view(1, -1)
-    #     delta_y = torch.clamp(torch.abs(delta_y / h), min=1e-3)
-    #     delta_y = torch.log(delta_y)  # [n_obj, n_obj]
-
-    #     delta_w = torch.log(w / w.view(1, -1))  # [n_obj, n_obj]
-    #     delta_h = torch.log(h / h.view(1, -1))  # [n_obj, n_obj]
-    #     size = delta_h.size()
-
-    #     delta_x = delta_x.view(size[0], size[1], 1)
-    #     delta_y = delta_y.view(size[0], size[1], 1)
-    #     delta_w = delta_w.view(size[0], size[1], 1)
-    #     delta_h = delta_h.view(size[0], size[1], 1)  # [n_obj, n_obj, 1]
-    #     position_mat = torch.cat((delta_x, delta_y, delta_w, delta_h), -1)  # [n_obj, n_obj, 4]
-
-    #     return position_mat
-
-
 
 
 class DataSet_Neg(Data.Dataset):
@@ -424,7 +378,6 @@ class DataSet_Neg(Data.Dataset):
 
         # Padding and process bbox relation
         imgfeat_bbox = self.proc_bbox(boxes, (image_h, image_w))
-        # imgfeat_relation = self.relation_embedding(torch.from_numpy(boxes.astype(np.float32)))  # [n_obj, n_obj, 4]
         imgfeat_input, imgfeat_mask, imgfeat_bbox = self.proc_imgfeat(imgfeat_input, imgfeat_bbox)
 
         imgfeat_input = torch.from_numpy(imgfeat_input)
@@ -510,15 +463,6 @@ class DataSet_Neg(Data.Dataset):
                 index += 1
         return vocab
 
-    @staticmethod
-    def sets_to_idmap(ans_sets):
-        ans_to_ix = {}
-        ix_to_ans = {}
-        for ans in ans_sets:
-            ix_to_ans[len(ans_to_ix)] = ans
-            ans_to_ix[ans] = len(ans_to_ix)
-
-        return ans_to_ix, ix_to_ans
 
     def load_npz(self, img_src, img_filename):
         np_file = os.path.join(self.__C.IMGFEAT_PATHMAP[img_src], 'npz_files', (img_filename + '.npz'))
@@ -565,9 +509,6 @@ class DataSet_Neg(Data.Dataset):
         imgfeat_input = self.np_pad_2d(imgfeat_input, length_pad)
         imgfeat_bbox = self.np_pad_2d(imgfeat_bbox, length_pad)
 
-        # imgfeat_relation_padded = torch.zeros(length_pad, length_pad, 4)
-        # imgfeat_relation_padded[:imgfeat_relation.size(0), :imgfeat_relation.size(1), :] = imgfeat_relation[:]
-
         return imgfeat_input, imgfeat_mask, imgfeat_bbox
 
     def proc_bbox(self, bbox, img_shape):
@@ -582,30 +523,3 @@ class DataSet_Neg(Data.Dataset):
 
         return bbox_feat
 
-    # def relation_embedding(self, f_g):
-    #     x_min, y_min, x_max, y_max = torch.chunk(f_g, 4, dim=1)  # [n_obj, 1]
-
-    #     cx = (x_min + x_max) * 0.5  # [n_obj, 1]
-    #     cy = (y_min + y_max) * 0.5  # [n_obj, 1]
-    #     w = (x_max - x_min) + 1.  # [n_obj, 1]
-    #     h = (y_max - y_min) + 1.  # [n_obj, 1]
-
-    #     delta_x = cx - cx.view(1, -1)
-    #     delta_x = torch.clamp(torch.abs(delta_x / w), min=1e-3)
-    #     delta_x = torch.log(delta_x)  # [n_obj, n_obj]
-
-    #     delta_y = cy - cy.view(1, -1)
-    #     delta_y = torch.clamp(torch.abs(delta_y / h), min=1e-3)
-    #     delta_y = torch.log(delta_y)  # [n_obj, n_obj]
-
-    #     delta_w = torch.log(w / w.view(1, -1))  # [n_obj, n_obj]
-    #     delta_h = torch.log(h / h.view(1, -1))  # [n_obj, n_obj]
-    #     size = delta_h.size()
-
-    #     delta_x = delta_x.view(size[0], size[1], 1)
-    #     delta_y = delta_y.view(size[0], size[1], 1)
-    #     delta_w = delta_w.view(size[0], size[1], 1)
-    #     delta_h = delta_h.view(size[0], size[1], 1)  # [n_obj, n_obj, 1]
-    #     position_mat = torch.cat((delta_x, delta_y, delta_w, delta_h), -1)  # [n_obj, n_obj, 4]
-
-    #     return position_mat

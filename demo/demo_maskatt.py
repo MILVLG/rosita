@@ -147,7 +147,7 @@ class DataSet():
         assert not (text_id is None and text is None)
 
         # Load text and image features
-        np_file = os.path.join('demo', 'imgfeats', (img_filename + '.npz'))
+        np_file = os.path.join('demo', 'features', (img_filename + '.npz'))
         npz_loaded = np.load(np_file)
         if text is None:
             text = list(npz_loaded['text'])[text_id]

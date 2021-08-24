@@ -131,7 +131,7 @@ class DataSet(Data.Dataset):
             refs_rank_label = refs_rank_label / (refs_rank_label.sum() + 1e-8)
             refs_rank_label = refs_rank_label.astype(np.float32)
 
-            refs_reg_label = bbox_transform(boxes, refs_boxes)  # np.tile(refs_bbox, (imgfeat_bbox.shape[0], 1))
+            refs_reg_label = bbox_transform(boxes, refs_boxes)
             if self.__C.BBOX_NORM:
                 refs_reg_label = ((refs_reg_label - np.array(self.__C.BBOX_NORM_MEANS)) / np.array(self.__C.BBOX_NORM_STDS))
             refs_reg_label = refs_reg_label.astype(np.float32)
@@ -203,17 +203,6 @@ class DataSet(Data.Dataset):
                 vocab[token] = index
                 index += 1
         return vocab
-
-
-    @staticmethod
-    def sets_to_idmap(ans_sets):
-        ans_to_ix = {}
-        ix_to_ans = {}
-        for ans in ans_sets:
-            ix_to_ans[len(ans_to_ix)] = ans
-            ans_to_ix[ans] = len(ans_to_ix)
-
-        return ans_to_ix, ix_to_ans
 
     
     def load_npz(self, img_src, img_filename):
