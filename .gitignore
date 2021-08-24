@@ -144,3 +144,5 @@ dmypy.json
 /demo/demo_maskatt_rsa.py
 /demo/search_sample.py
 /demo/merge_text2npz.py
+
+/rosita/data/load_data.py

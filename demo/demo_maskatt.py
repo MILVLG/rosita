@@ -6,10 +6,13 @@
 
 import torch, math
 import torch.nn as nn
+import torch.nn.functional as F
 from rosita.modeling.transformer import LayerNorm, FeedForward, TextEmbeddings, VisualEmbeddings, Pooler
 import numpy as np
-import re, torch, collections, copy, os
+import re, torch, collections, copy, os, cv2
 from utils.tokenizer import BertTokenizer
+import matplotlib.pyplot as plt
+from pylab import ylim
 
 
 class MHAtt(nn.Module):
@@ -143,18 +146,23 @@ class DataSet():
         self.vocab_size = len(self.tokenizer.vocab)
 
 
-    def get_item(self, img_filename, mask_side, mask_id, text_id=None, text=None):
-        assert not (text_id is None and text is None)
-
-        # Load text and image features
+    def load_npz(self, img_filename, text_id=None):
         np_file = os.path.join('demo', 'features', (img_filename + '.npz'))
         npz_loaded = np.load(np_file)
-        if text is None:
-            text = list(npz_loaded['text'])[text_id]
+        text = None if text_id is None else list(npz_loaded['text'])[text_id]
         imgfeat_x = npz_loaded['x']
         image_h = npz_loaded['image_h']
         image_w = npz_loaded['image_w']
         boxes = npz_loaded['boxes']
+        return text, imgfeat_x, image_h, image_w, boxes
+
+    
+    def get_item(self, img_filename, mask_side, mask_id, text_id=None, text_=None):
+        assert not (text_id is None and text_ is None)
+
+        # Load text and image features
+        text, imgfeat_x, image_h, image_w, boxes = self.load_npz(img_filename, text_id)
+        text = text_ if text_ is not None else text
         text = self.clean_text(text)
 
         # Proc masking tasks
@@ -325,3 +333,163 @@ class DataSet():
 
         return bbox_feat
 
+
+class Visualizer():
+    def __init__(self, dataset, net):
+        self.dataset = dataset
+        self.net = net
+    
+
+    def show_regions(self, img_filename, boxes_id=None):
+        boxes_id = range(36) if boxes_id is None else boxes_id
+        img_root_path = 'demo/images/'
+        img_path = img_root_path + img_filename
+        img = cv2.imread(img_path)
+        img = cv2.cvtColor(img.astype(np.uint8), cv2.COLOR_BGR2RGB)
+        text, imgfeat_x, image_h, image_w, boxes = self.dataset.load_npz(img_filename)
+
+        plt.figure(figsize=(15, 6))
+        # plt.subplot(1, len(weights_list)+1, 1)
+        plt.imshow(img)
+        plt.axis('off')
+        for ix, idx in enumerate(boxes_id):
+            bbox = boxes[idx]
+            if bbox[0] == 0:
+                bbox[0] = 1
+            if bbox[1] == 0:
+                bbox[1] = 1
+            box_name = 'bboxid:{}'.format(idx)
+            plt.gca().add_patch(
+                plt.Rectangle((bbox[0], bbox[1]),
+                            bbox[2] - bbox[0],
+                            bbox[3] - bbox[1], fill=False,
+                            edgecolor='red', linewidth=2, alpha=0.5)
+                    )
+            plt.gca().text(bbox[0], bbox[1] - 2,
+                        '%s' % (box_name),
+                        bbox=dict(facecolor='blue', alpha=0.5),
+                        fontsize=10, color='white')
+
+    
+    def show_words(self, img_filename, text_id=None, text_=None):
+        assert not (text_id is None and text_ is None)
+        text, imgfeat_x, image_h, image_w, boxes = self.dataset.load_npz(img_filename, text_id)
+        text = text_ if text_ is not None else text
+        text = self.dataset.clean_text(text)
+        tokenized_text = self.dataset.tokenizer.tokenize(text)
+        self.dataset.check_tsg(text, tokenized_text)
+        for i, word in enumerate(tokenized_text):
+            print('word id: {}, word: {}'.format(i, word))
+
+
+
+    def show_maskatt_img(self, img_filename, mask_side, mask_id_list, text_id=None, text=None):    
+        with torch.no_grad():
+            text_input_ids, text_mask, text_mlm_label_ids, \
+            imgfeat_input, imgfeat_mask, imgfeat_bbox, \
+            text_len, boxes = self.dataset.get_item(img_filename, mask_side, mask_id_list, text_id, text)
+
+            text_input_ids_batch = text_input_ids.to('cuda:0').unsqueeze(0)
+            text_mask_batch = text_mask.to('cuda:0').unsqueeze(0)
+            imgfeat_input_batch = imgfeat_input.to('cuda:0').unsqueeze(0)
+            imgfeat_mask_batch = imgfeat_mask.to('cuda:0').unsqueeze(0)
+            imgfeat_bbox_batch = imgfeat_bbox.to('cuda:0').unsqueeze(0)
+
+            net_input = (text_input_ids_batch, text_mask_batch, imgfeat_input_batch, imgfeat_mask_batch, imgfeat_bbox_batch)
+            net_output = self.net(net_input)
+
+            scores_out_list = net_output
+
+            text_label = [self.dataset.tokenizer.ids_to_tokens[t.item()] for t in text_mlm_label_ids][1: 1 + text_len]
+            img_root_path = 'demo/images/'
+            img_path = img_root_path + img_filename
+            print(f'image_path: {img_path}')
+
+            def att_text(text_lbl, msk_ids):
+                for msk_id in msk_ids:
+                    text_lbl[msk_id] = '|[{}]|'.format(text_lbl[msk_id])
+                text_att = ''
+                for i in range(len(text_lbl)):
+                    if i == 0:
+                        text_att += text_lbl[i]
+                    elif text_lbl[i].startswith('#'):
+                        text_att += text_lbl[i].replace('#', '')
+                    else:
+                        text_att += ' ' + text_lbl[i]
+                return text_att
+
+            if mask_side == 'text':
+                weights_list = []
+                for idx in mask_id_list:
+                    scores = copy.deepcopy(scores_out_list[-1][0, :, idx + 1, -36:].sum(-2))
+                    weights = F.softmax(scores, dim=-1).numpy()
+                    weights_list.append(weights)
+
+                text_att = att_text(copy.deepcopy(text_label), mask_id_list)
+                print(text_att)
+                plt.figure(figsize=(6*len(weights_list), 6))
+                for weight_id, weights in enumerate(weights_list):
+                    masked = text_label[mask_id_list[weight_id]] if len(mask_id_list) else None
+                    img_att = cv2.imread(img_path)
+                    Vv = 180.
+                    max_imgfeat = 36
+                    mask = np.zeros_like(img_att[:, :, 2], dtype=np.float32)
+                    for ix, box in enumerate(boxes):
+                        if ix == max_imgfeat:
+                            break
+                        x1 = int(box[0])
+                        y1 = int(box[1])
+                        x2 = int(box[2])
+                        y2 = int(box[3])
+                        mask[y1:y2, x1:x2] = mask[y1:y2, x1:x2] + weights[ix]
+                    mask = (mask - np.min(mask)) / (np.max(mask) - np.min(mask))
+                    mask = np.power(mask, 0.3)
+                    picHSV = cv2.cvtColor(img_att, cv2.COLOR_BGR2HSV).astype(np.float32)
+                    picHSV[:, :, 2] = picHSV[:, :, 2] - Vv
+                    picHSV[:, :, 2] = picHSV[:, :, 2] + mask * Vv
+                    picHSV[:, :, 2][picHSV[:, :, 2] < 0] = 0
+                    picHSV[:, :, 2][picHSV[:, :, 2] > 250] = 250
+                    img_att = cv2.cvtColor(picHSV.astype(np.uint8), cv2.COLOR_HSV2RGB)
+                    plt.subplot(1, len(weights_list), weight_id+1)
+                    plt.title('masked word: {}'.format(masked))
+                    plt.imshow(img_att)
+                    plt.axis('off')
+                plt.show()
+            
+            else:
+                img_att = cv2.imread(img_path)
+                img_att = cv2.cvtColor(img_att.astype(np.uint8), cv2.COLOR_BGR2RGB)
+
+                weights_list = []
+                for idx in mask_id_list:
+                    scores = copy.deepcopy(scores_out_list[-1][0, :, 20 + idx, 1: 1 + text_len].sum(-2))
+                    weights = F.softmax(scores, dim=-1).numpy()
+                    weights_list.append(weights)
+                plt.figure(figsize=(15*len(weights_list)+1, 6))
+                plt.subplot(1, len(weights_list)+1, 1)
+                plt.imshow(img_att)
+                plt.axis('off')
+                for ix, idx in enumerate(mask_id_list):
+                    bbox = boxes[idx]
+                    if bbox[0] == 0:
+                        bbox[0] = 1
+                    if bbox[1] == 0:
+                        bbox[1] = 1
+                    box_name = 'maskid:{} bboxid:{}'.format(ix, idx)
+                    plt.gca().add_patch(
+                        plt.Rectangle((bbox[0], bbox[1]),
+                                    bbox[2] - bbox[0],
+                                    bbox[3] - bbox[1], fill=False,
+                                    edgecolor='red', linewidth=2, alpha=0.5)
+                            )
+                    plt.gca().text(bbox[0], bbox[1] - 2,
+                                '%s' % (box_name),
+                                bbox=dict(facecolor='blue', alpha=0.5),
+                                fontsize=10, color='white')
+                for weight_id, weights in enumerate(weights_list):
+                    plt.subplot(1, len(weights_list)+1, weight_id+2)
+                    plt.title('masked id: {}'.format(weight_id))
+                    plt.bar(range(len(text_label)), weights, width=0.5, fc='g', tick_label=text_label)
+                    plt.xticks(rotation=45)
+                    ylim([0., 1.])
+                plt.show()
