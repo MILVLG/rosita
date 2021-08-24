@@ -2,7 +2,10 @@
 
 
 
-## News & Update
+## News & Updates
+
+**(24/08/2021)**
+- Release the demo to perform fine-grained semantic alignments using the pretrained ROSITA model.
 
 **(15/08/2021)**
 - Release the basic framework for ROSITA, including the pretrained base ROSITA model, as well as the scripts to run the fine-tuning and evaluation on three downstream tasks (i.e., VQA, REC, ITR) over six datasets.
@@ -100,6 +103,11 @@ Please check [pretrain.md](docs/pretrain.md) for the details for ROSITA pretrain
 ## Finetuning
 
 Please check [finetune.md](docs/finetune.md) for the details for finetuning on downstream tasks. Scripts to run finetuning on downstream tasks are provided. Also, we provide trained models that can be directly evaluated to reproduce the results.  
+
+
+## Demo
+
+We provide the [Jupyter notebook scripts](demo/demo_maskatt.ipynb) for reproducing the visualization results shown in our paper.
 
 ## Acknowledgment
 
