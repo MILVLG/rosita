@@ -74,14 +74,14 @@ def vqa_eval(__C, loader, net, valid=False):
         eval_set = __C.DATASET_LIST['val'][0].split(':')[1]
         if eval_set in ['val']:
             ques_file_path = os.path.join(__C.DATASET_PATHMAP[ 'vqa-vqav2'], 
-                'v2_Questions_Val_mscoco/v2_OpenEnded_mscoco_val2014_questions.json')
+                'v2_OpenEnded_mscoco_val2014_questions.json')
             ans_file_path = os.path.join(__C.DATASET_PATHMAP['vqa-vqav2'],
-                'v2_Annotations_Val_mscoco/v2_mscoco_val2014_annotations.json')
+                'v2_mscoco_val2014_annotations.json')
         elif eval_set in ['minival']:
             ques_file_path = os.path.join(__C.DATASET_PATHMAP['vqa-vqav2'],  
-                'v2_Questions_Val_mscoco/v2_OpenEnded_mscoco_minival2014_questions.json')
+                'v2_OpenEnded_mscoco_minival2014_questions.json')
             ans_file_path = os.path.join(__C.DATASET_PATHMAP['vqa-vqav2'],
-                'v2_Annotations_Val_mscoco/v2_mscoco_minival2014_annotations.json')
+                'v2_mscoco_minival2014_annotations.json')
 
         vqa = VQA(ans_file_path, ques_file_path)
         vqaRes = vqa.loadRes(result_eval_file, ques_file_path)

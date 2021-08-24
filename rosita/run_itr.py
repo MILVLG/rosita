@@ -538,7 +538,6 @@ def mp_entrance(local_rank, world_size, args, __C):
     global_rank = args.NODE_ID * world_size + local_rank
     __C.set_rank(global_rank, local_rank)
     dist.init_process_group("nccl", rank=global_rank, world_size=world_size * args.NODE_SIZE, timeout=datetime.timedelta(minutes=120))
-
     
     exec = Execution(__C, Net, __C.RUN_MODE)
     exec.run()
@@ -560,6 +559,7 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
+    os.environ['CUDA_VISIBLE_DEVICES'] = args.GPU
 
     WORLD_SIZE = len(args.GPU.split(','))
     __C = Cfg(WORLD_SIZE, args)
@@ -572,7 +572,6 @@ if __name__ == '__main__':
     __C.add_args(yaml_dict)
     __C.proc(args.resume)
     print(__C)
-    os.environ['CUDA_VISIBLE_DEVICES'] = args.GPU
     if args.MASTER_PORT == 'auto':
         args.MASTER_PORT = str(random.randint(13390, 17799))
     print('MASTER_ADDR:', args.MASTER_ADDR)

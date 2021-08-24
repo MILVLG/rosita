@@ -128,10 +128,21 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-/ckpts/*
+/.vscode/
+/ckpts/*.pkl
 /datasets/annotations/*
 !/datasets/annotations/.gitkeep
 /datasets/imgfeats/*
 !/datasets/imgfeats/.gitkeep
 /outputs/*
 !/outputs/.gitkeep
+/demo/saved_att_img/
+/demo/load_data_mask_att.py
+/demo/load_data_mask_att_ori.py
+/demo/load_data_mask_att_rsa.py
+/demo/demo_maskatt_ori.py
+/demo/demo_maskatt_rsa.py
+/demo/search_sample.py
+/demo/merge_text2npz.py
+
+/rosita/data/load_data.py
