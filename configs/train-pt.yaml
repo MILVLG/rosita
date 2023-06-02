@@ -1,0 +1,23 @@
+VERSION: train-pretrain
+RUN_MODE: train
+DATASET_ROOTPATH: datasets
+OUTPATH: outputs/pretrain
+
+ANNO_FORMAT: tsv
+TSV_ON_MEMORY: False
+
+IMGFEAT_FORMAT: npz
+
+DATASET_LIST:
+  train:
+    - pt-coco:train
+    - pt-conceptual:train
+    - pt-sbu:train
+    - pt-vg:train
+
+# Workers and batch size
+NUM_WORKERS: 8
+BATCH_SIZE: 128
+
+# Load ckpt
+CKPT_FILE: ckpts/bert-base.pkl

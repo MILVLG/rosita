@@ -145,4 +145,3 @@ dmypy.json
 /demo/search_sample.py
 /demo/merge_text2npz.py
 
-/rosita/data/load_data.py
