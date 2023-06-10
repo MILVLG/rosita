@@ -1,19 +1,14 @@
-import yaml, os, json, torch, datetime, random, copy, shutil, logging, socket, argparse
+import yaml, os, torch, datetime, random, logging, argparse
 import torch.nn as nn
 import torch.optim as Optim
-import torch.nn.functional as F
-import torch.utils.data as Data
 import numpy as np
-from collections import namedtuple
-# from tkinter import _flatten
 from modeling.pretrain_tasks.rosita import Net
 from config.cfg_pretrain import Cfg
-from utils.vqa.eval import vqa_eval
 
 import torch.distributed as dist
 import torch.multiprocessing as mp
 
-from data.load_data2 import DataSet
+from data.load_data_pretrain import DataSet
 
 from utils.optimizer import BertAdam, WarmupOptimizer
 from utils.sampler import SubsetDistributedSampler
@@ -22,10 +17,18 @@ from utils.weight_filter import qa_cls_weight_filter
 
 import en_vectors_web_lg
 
-from torch.nn.parallel import DistributedDataParallel as DDP
+try:
+    import apex
+    from apex import amp, optimizers
+    from apex.parallel import DistributedDataParallel as DDP
+    # from apex.fp16_utils import *
+    # from apex.multi_tensor_apply import multi_tensor_applier
+except ImportError:
+    raise ImportError(
+        'Please install apex from https://www.github.com/nvidia/apex to run this example, Or set <APEX> False.')
+# assert torch.backends.cudnn.enabled, 'Amp requires cudnn backend to be enabled.'
 
 
-        
 class Execution:
     def __init__(self, __C, Net, RUN_MODE):
         self.__C = __C
@@ -77,8 +80,13 @@ class Execution:
         net = Net(self.__C, init_map)
         net_optim, net_optim_inside = self.get_optim(net, epoch_steps=len(train_loader))
 
+        if self.__C.BN_SYNC:
+            logging.info('Using Apex Synced BN')
+            net = apex.parallel.convert_syncbn_model(net)
         net.to(self.__C.DEVICE_IDS[0])
-        net = DDP(net, device_ids=self.__C.DEVICE_IDS)
+        net, net_optim_inside = amp.initialize(net, optimizers=net_optim_inside, opt_level=self.__C.APEX_LEVEL,
+                                                keep_batchnorm_fp32=self.__C.BN_FP32, loss_scale=None, num_losses=1)
+        net = DDP(net, delay_allreduce=True)
 
         # Loading model weight
         if self.__C.CKPT_LOAD:
@@ -112,7 +120,9 @@ class Execution:
 
                     getattr(net.module, weight_key).load_state_dict(weight_load, strict=strict)
                 elif weight_key in ['net_optim']:
-                    net_optim_inside.load_state_dict(ckpt[self.__C.CKPT_LOAD_MAP[weight_key]])
+                        net_optim_inside.load_state_dict(ckpt[self.__C.CKPT_LOAD_MAP[weight_key]])
+                elif weight_key in ['amp'] and self.__C.CKPT_LOAD_MAP[weight_key] in ckpt:
+                    amp.load_state_dict(ckpt[self.__C.CKPT_LOAD_MAP[weight_key]])
                 else:   # weight_key is epoch
                     self.__C.CKPT_EPOCH = ckpt[self.__C.CKPT_LOAD_MAP[weight_key]]
 
@@ -196,7 +206,8 @@ class Execution:
                 # print(total_loss)
                 # print(losses)
 
-                total_loss.backward()
+                with amp.scale_loss(total_loss, net_optim_inside, loss_id=0) as scaled_loss:
+                    scaled_loss.backward()
 
                 total_loss_sum += total_loss.item()
                 text_mlm_loss_sum += losses[0].item()
@@ -217,7 +228,7 @@ class Execution:
 
                 # gradient clipping
                 if self.__C.NET_GRAD_CLIP > 0:
-                    nn.utils.clip_grad_norm_(net.parameters(), self.__C.NET_GRAD_CLIP)
+                    nn.utils.clip_grad_norm_(amp.master_params(net_optim_inside), self.__C.NET_GRAD_CLIP)
                 net_optim.step()
 
                 # # gradient check
@@ -235,13 +246,17 @@ class Execution:
                     if weight_key not in ['net_optim', 'amp', 'epoch']:
                         state[self.__C.CKPT_SAVE_MAP[weight_key]] = getattr(net.module, weight_key).state_dict()
                     elif weight_key in ['net_optim']:
-                        state[self.__C.CKPT_SAVE_MAP[weight_key]] = net_optim_inside.state_dict()
+                            state[self.__C.CKPT_SAVE_MAP[weight_key]] = net_optim_inside.state_dict()
+                    elif weight_key in ['amp']:
+                        state[self.__C.CKPT_SAVE_MAP[weight_key]] = amp.state_dict()
                     else:   # weight_key is epoch
                         state[self.__C.CKPT_SAVE_MAP[weight_key]] = epoch + 1
 
-                save_model_path = os.path.join(self.__C.CKPT_SAVE_PATH, (self.__C.VERSION + '_epoch' + str(
-                    epoch_finish) + '.pkl'))
-                torch.save(state, save_model_path)
+                # if epoch_finish == self.__C.MAX_EPOCH:
+                if epoch_finish == self.__C.MAX_EPOCH or epoch_finish % 10 == 0:
+                    save_model_path = os.path.join(self.__C.CKPT_SAVE_PATH, (self.__C.VERSION + '_epoch' + str(
+                        epoch_finish) + '.pkl'))
+                    torch.save(state, save_model_path)
                 last_model_path = os.path.join(self.__C.CKPT_SAVE_PATH, 'last_ckpt.pkl')
                 torch.save(state, last_model_path)
 
@@ -266,44 +281,6 @@ class Execution:
             mm_qa_loss_sum = 0
             grad_norm = np.zeros(len(named_params))
 
-            # if eval_loader is not None:
-            #     self.eval(eval_loader, net=net, valid=True, task='vqa')
-            # break
-
-
-    def eval(self, loader, net=None, valid=False, task='vqa'):
-        init_map = {
-            'vocab_size': loader.dataset.vocab_size,
-            'ans_size': loader.dataset.ans_size,
-        }
-
-        if net is None:
-            logging.info('Load Checkpoint')
-            path = self.__C.CKPT_FILE
-            logging.info('Loading the {}'.format(path))
-
-            rank0_devices = [x - self.__C.LRANK * len(self.__C.DEVICE_IDS) for x in self.__C.DEVICE_IDS]
-            device_pairs = zip(rank0_devices, self.__C.DEVICE_IDS)
-            map_location = {'cuda:%d' % x: 'cuda:%d' % y for x, y in device_pairs}
-            ckpt = torch.load(path, map_location=map_location)
-            logging.info('Checkpoint Loaded')
-
-            net = Net(self.__C, init_map)
-            net.to(self.__C.DEVICE_IDS[0])
-            net = DDP(net, device_ids=self.__C.DEVICE_IDS)
-
-            for weight_key in self.__C.CKPT_SAVE_MAP:
-                if weight_key not in ['net_optim', 'amp']:
-                    getattr(net.module, weight_key).load_state_dict(ckpt[self.__C.CKPT_SAVE_MAP[weight_key]])
-
-        net.eval()
-        loader.sampler.set_shuffle(False)
-
-        with torch.no_grad():
-            if task in ['vqa']:
-                vqa_eval(self.__C, loader, net, valid)
-            elif task in ['itm']:
-                pass
 
     def run(self):
         spacy_tool = en_vectors_web_lg.load()
@@ -339,23 +316,6 @@ class Execution:
                 )
 
             self.train(train_loader, eval_loader)
-
-
-        elif self.RUN_MODE in ['val', 'test']:
-            eval_text_segment = None
-            if self.__C.SEGMENT_TEXT:
-                eval_text_segment = TextSegment(self.__C, self.RUN_MODE)
-
-            eval_dataset = DataSet(self.__C, self.RUN_MODE, text_segment=eval_text_segment, spacy_tool=spacy_tool)
-            eval_sampler = SubsetDistributedSampler(eval_dataset, shuffle=False)
-            eval_loader = torch.utils.data.DataLoader(
-                eval_dataset,
-                batch_size=self.__C.EVAL_BATCH_SIZE,
-                sampler=eval_sampler,
-                num_workers=self.__C.NUM_WORKERS
-            )
-
-            self.eval(eval_loader, valid=self.RUN_MODE in ['val'])
 
 
 def mp_entrance(local_rank, world_size, args, __C):

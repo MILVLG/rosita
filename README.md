@@ -95,7 +95,7 @@ To download the required datasets to run this project, please check [datasets.md
 
 ## Pretraining
 
-Please check [pretrain.md](docs/pretrain.md) for the details for ROSITA pretraining. **We currently only provide the pretrained model to run finetuning on downstream tasks. The codes to run pretraining will be released later**.  
+Please check [pretrain.md](docs/pretrain.md) for the details for ROSITA pretraining. Script to run pretraining is provided. 
 
 ## Finetuning
 
