@@ -4,6 +4,9 @@
 
 ## News & Updates
 
+**(13/06/2023)**
+- Release the pretraining scripts for ROSITA. 
+
 **(24/08/2021)**
 - Release the demo to perform fine-grained semantic alignments using the pretrained ROSITA model.
 
@@ -78,6 +81,7 @@ We recommand a workstation with **4 GPU (>= 24GB, e.g., RTX 3090 or V100)**, **1
 - PyTorch >= 1.4 with Cuda >=10.2
 - torchvision >= 0.5.0
 - Cython
+- Apex\@0c7d8e3
 
 ```bash
 # git clone
@@ -87,6 +91,12 @@ $ git clone https://github.com/MILVLG/rosita.git
 $ cd rosita/rosita/utils/rec
 $ python setup.py build
 $ cp build/lib*/bbox.cpython*.so .
+
+# build apex@0c7d8e3
+$ git clone https://github.com/NVIDIA/apex.git
+$ cd apex
+$ git checkout 0c7d8e3
+$ python setup.py install
 ```
 
 
