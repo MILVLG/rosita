@@ -75,7 +75,7 @@ For each pretraining dataset, we provide the formatted annotation files in tsv f
 
 #### MSCOCO
 
-You can download the formatted annotations [here](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/Ed3QUwvH5SpJkb7lm2bOEXgBqG5OmWExbF0rUq3Es9fmYg?download=1) and run the following command to unzip the annotations:
+You can download the formatted annotations [here](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EV40L1mEU2JHhHBKNlXBT0EB5crLR_pdBX9py3dmo4vbUQ?download=1) and run the following command to unzip the annotations:
 ```bash
 $ cd datasets/annotations
 $ tar -xzvf pt-coco.tar.gz
@@ -104,7 +104,7 @@ After unzipping, there will be a folder `pt-coco`  containing several files, the
 
 #### Visual Genome
 
-You can download the formatted annotations [here](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/Ed3QUwvH5SpJkb7lm2bOEXgBqG5OmWExbF0rUq3Es9fmYg?download=1) and run the following command to unzip the annotations:
+You can download the formatted annotations [here](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/ESET6YQxB_hHioTOF8jlwKABYQyLCY0QkL6cYBlamAbxXQ?download=1) and run the following command to unzip the annotations:
 ```bash
 $ cd datasets/annotations
 $ tar -xzvf pt-vg.tar.gz
@@ -126,7 +126,7 @@ After unzipping, there will be a folder `pt-vg`  containing several files, the `
 
 #### SBU
 
-You can download the formatted annotations [here](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/Ed3QUwvH5SpJkb7lm2bOEXgBqG5OmWExbF0rUq3Es9fmYg?download=1) and run the following command to unzip the annotations:
+You can download the formatted annotations [here](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EattQurnnZRKo8rGfFp9pjkBzRk6C4fH50tiXkETdoSa8w?download=1) and run the following command to unzip the annotations:
 ```bash
 $ cd datasets/annotations
 $ tar -xzvf pt-sbu.tar.gz
@@ -147,7 +147,7 @@ After unzipping, there will be a folder `pt-sbu`  containing several files, the 
 
 #### Conceptual
 
-You can download the formatted annotations [here](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/Ed3QUwvH5SpJkb7lm2bOEXgBqG5OmWExbF0rUq3Es9fmYg?download=1) and run the following command to unzip the annotations:
+You can download the formatted annotations [here](https://awma1-my.sharepoint.com/:u:/g/personal/yuz_l0_tn/EXqy0wuOZOpHvquweLnxDu8B8P2WHfGfc2jzNqZasMZekg?download=1) and run the following command to unzip the annotations:
 ```bash
 $ cd datasets/annotations
 $ tar -xzvf pt-conceptual.tar.gz
