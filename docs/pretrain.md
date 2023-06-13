@@ -1,12 +1,18 @@
 # Pretraining
 
-We provide the pretrained models to support the finetuning on downstream tasks.  More models will be updated continuously.
+We provide the pretraining script as well as the pretrained model to support the finetuning on downstream tasks.  More models will be updated continuously.
 
 
 
 ## Pretraining Scripts
 
+The following script run the pretraining on the MSCOCO, VG, SBU, Conceptual datasets. 
 
+```bash
+$ bash scripts/train-pt.sh
+```
+
+As the pretraining stage complete, you may run the [finetuning scripts](finetune.md) on downstream tasks. 
 
 
 
